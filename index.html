@@ -103,7 +103,7 @@
         <div class="flex items-center gap-2 text-xs">
           <div class="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800">
             <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
-            <span id="mastered-count-badge" class="text-emerald-400 font-bold">0/86</span>
+            <span id="mastered-count-badge" class="text-emerald-400 font-bold">0/98</span>
             <span class="text-slate-500">প্রস্তুত</span>
           </div>
           <button onclick="toggleTheme()" id="theme-toggle" class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-400 hover:text-white transition-all" title="থিম পরিবর্তন">
@@ -118,7 +118,7 @@
       <!-- Navigation Tabs -->
       <div class="flex items-center gap-1 overflow-x-auto border-t border-slate-800/80 pt-1 pb-2">
         <button onclick="switchTab('chapters')" id="tab-btn-chapters" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-indigo-600 text-white shadow-md">
-          <i data-lucide="layers" class="w-4 h-4"></i> অধ্যায় ট্র্যাকার (86)
+          <i data-lucide="layers" class="w-4 h-4"></i> অধ্যায় ট্র্যাকার (98)
         </button>
         <button onclick="switchTab('formulas')" id="tab-btn-formulas" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white">
           <i data-lucide="calculator" class="w-4 h-4"></i> সূত্র ভাণ্ডার
@@ -165,7 +165,7 @@
             <div class="progress-ring" id="progress-ring"><div><span id="hero-progress">0%</span><small>complete</small></div></div>
             <div class="text-white">
               <div class="text-xs text-indigo-100">তোমার প্রগ্রেস</div>
-              <div id="hero-mastered" class="text-xl font-extrabold mt-1">০ / ৮৬</div>
+              <div id="hero-mastered" class="text-xl font-extrabold mt-1">০ / ৯৮</div>
               <div class="text-[11px] text-indigo-100/80">অধ্যায় সম্পন্ন</div>
             </div>
           </div>
@@ -176,7 +176,7 @@
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
           <div class="text-xs text-slate-400">সর্বমোট অধ্যায়</div>
-          <div class="text-2xl font-extrabold text-white mt-1">৮৬ টি</div>
+          <div class="text-2xl font-extrabold text-white mt-1">৯৮ টি</div>
           <div class="text-[11px] text-slate-500">৮টি আবশ্যক বিষয়</div>
         </div>
         <div class="bg-slate-900/80 border border-emerald-500/20 rounded-2xl p-4">
@@ -351,25 +351,27 @@
 
   <!-- COMPLETE DATASET & JAVASCRIPT SCRIPT -->
   <script>
-    // 1. DATASET OF 8 SUBJECTS & ALL 86 CHAPTERS
+    // 1. DATASET OF 8 SUBJECTS & ALL 98 CHAPTERS
     const SUBJECTS = [
       {
         id: 'physics',
         name: 'পদার্থবিজ্ঞান',
         color: 'text-cyan-400',
         chapters: [
-          { id: 'phy-1', name: 'ভৌত রাশি এবং পরিমাপ', summary: 'মৌলিক ও লব্ধ রাশি, স্লাইড ক্যালিপার্স, স্ক্রু গজ ও ভার্নিয়ার ধ্রুবক।', formulas: ['VC = s / n', 'L = M + (V × VC)'] },
-          { id: 'phy-2', name: 'গতি', summary: 'দূরত্ব, সরণ, দ্রুতি, বেগ, ত্বরণ ও গতির মৌলিক সমীকরণ।', formulas: ['v = u + at', 's = ut + 0.5at²', 'v² = u² + 2as'] },
-          { id: 'phy-3', name: 'বল', summary: 'নিউটনের গতির সূত্র, জড়তা, ভরবেগ ও ঘর্ষণ বল।', formulas: ['F = ma', 'm₁u₁ + m₂u₂ = m₁v₁ + m₂v₂'] },
-          { id: 'phy-4', name: 'কাজ, শক্তি ও ক্ষমতা', summary: 'গতিশক্তি, বিভবশক্তি, শক্তির সংরক্ষণশীলতা নীতি ও কর্মদক্ষতা।', formulas: ['W = Fs', 'Ek = 0.5mv²', 'Ep = mgh', 'η = (P_out / P_in) × 100%'] },
-          { id: 'phy-5', name: 'পদার্থের অবস্থা ও চাপ', summary: 'চাপ, ঘনত্ব, আর্কিমিডিসের সূত্র ও প্লবতা, প্যাসকেলের সূত্র।', formulas: ['P = hρg', 'B = Vρg', 'F₂/F₁ = A₂/A₁'] },
-          { id: 'phy-6', name: 'বস্তুর ওপর তাপের প্রভাব', summary: 'তাপমাত্রা স্কেল রূপান্তর, কঠিন পদার্থের প্রসারণ ও আপেক্ষিক তাপ।', formulas: ['C/5 = (F-32)/9 = (K-273)/5', 'Q = mcΔθ'] },
-          { id: 'phy-7', name: 'তরঙ্গ ও শব্দ', summary: 'তরঙ্গদৈর্ঘ্য, কম্পাঙ্ক, শব্দের বেগ ও প্রতিধ্বনি।', formulas: ['v = fλ', 'd = (v × t) / 2'] },
-          { id: 'phy-8', name: 'আলোর প্রতিফলন ও প্রতিসরণ', summary: 'দর্পণ সমীকরণ, প্রতিসরাঙ্ক, ক্রান্তি কোণ ও লেন্সের ক্ষমতা।', formulas: ['1/u + 1/v = 1/f', 'P = 1/f(m)'] },
-          { id: 'phy-9', name: 'স্থির ও চল বিদ্যুৎ', summary: 'কুলম্বের সূত্র, ওহমের সূত্র, তুল্যরোধ ও বিদ্যুৎ বিলের হিসাব।', formulas: ['V = IR', 'Unit(kWh) = (P × t)/1000', 'Rs = R₁ + R₂'] },
-          { id: 'phy-10', name: 'বিদ্যুতের চৌম্বক ক্রিয়া', summary: 'তাড়িতচৌম্বক আবেশ, সলিনয়েড ও ট্রান্সফরমার।', formulas: ['Vp/Vs = Np/Ns = Is/Ip'] },
-          { id: 'phy-11', name: 'আধুনিক পদার্থবিজ্ঞান ও ইলেকট্রনিক্স', summary: 'তেজস্ক্রিয়তা, p-n জংশন ডায়োড ও সেমিকন্ডাক্টর।', formulas: ['ডায়োডের একমুখীকরণ (Rectification)'] },
-          { id: 'phy-12', name: 'জীবন বাঁচাতে পদার্থবিজ্ঞান', summary: 'এক্স-রে, সিটি স্ক্যান, এমআরআই (MRI) ও আল্ট্রাসনোগ্রাফি।', formulas: ['শব্দোত্তর তরঙ্গ ও চৌম্বক ক্ষেত্র'] }
+          { id: 'physics-1', name: 'ভৌত রাশি এবং পরিমাপ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-2', name: 'গতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-3', name: 'বল', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-4', name: 'কাজ, শক্তি ও ক্ষমতা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-5', name: 'পদার্থের অবস্থা ও চাপ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-6', name: 'বস্তুর ওপর তাপের প্রভাব', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-7', name: 'তরঙ্গ ও শব্দ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-8', name: 'আলোর প্রতিফলন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-9', name: 'আলোর প্রতিসরণ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-10', name: 'স্থির বিদ্যুৎ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-11', name: 'চল বিদ্যুৎ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-12', name: 'বিদ্যুতের চৌম্বক ক্রিয়া', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-13', name: 'আধুনিক পদার্থবিজ্ঞান ও ইলেকট্রনিক্স', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-14', name: 'জীবন বাঁচাতে পদার্থবিজ্ঞান', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
         ]
       },
       {
@@ -377,16 +379,18 @@
         name: 'রসায়ন',
         color: 'text-emerald-400',
         chapters: [
-          { id: 'ch-1', name: 'রসায়নের ধারণা', summary: 'রসায়নের পরিধি ও ঝুঁকিপূর্ণ পদার্থের হ্যাজার্ড প্রতীকসমূহ।', formulas: ['হ্যাজার্ড লেবেল ও সতর্কতা'] },
-          { id: 'ch-2', name: 'পদার্থের অবস্থা ও গঠন', summary: 'কণার গতিতত্ত্ব, ব্যাপন ও নিঃসরণ, পাতন ও উর্ধ্বপাতন।', formulas: ['গ্রাহামের ব্যাপন: r ∝ 1/√M'] },
-          { id: 'ch-3', name: 'পর্যায় সারণি', summary: 'পর্যায় ও গ্রুপ নির্ণয়, পর্যায়বৃত্ত ধর্ম ও ইলেকট্রন বিন্যাস।', formulas: ['পারমাণবিক ব্যাসার্ধ, আয়নীকরণ শক্তি'] },
-          { id: 'ch-4', name: 'রাসায়নিক বন্ধন', summary: 'যোজ্যতা ইলেকট্রন, আয়নিক বন্ধন, সমযোজী বন্ধন ও ধাতব বন্ধন।', formulas: ['অষ্টক ও দুইয়ের নিয়ম'] },
-          { id: 'ch-5', name: 'মোলের ধারণা ও রাসায়নিক গণনা', summary: 'মোল, মোলারিটি, শতকরা সংযুতি ও লিমিটিং বিক্রিয়ক।', formulas: ['n = W/M = V/22.4 = N/(6.023×10²³)', 'S = (1000W)/(MV)'] },
-          { id: 'ch-6', name: 'রাসায়নিক বিক্রিয়া', summary: 'জারণ-বিজারণ (Redox), জারণ সংখ্যা ও লা-শাতেলিয়ারের নীতি।', formulas: ['জারণ = ইলেকট্রন বর্জন, বিজারণ = গ্রহণ'] },
-          { id: 'ch-7', name: 'রসায়ন ও শক্তি', summary: 'তাপোৎপাদী ও তাপহারী বিক্রিয়া, বন্ধন শক্তি ও তড়িৎ বিশ্লেষণ।', formulas: ['ΔH = ভাঙার শক্তি - গড়ার শক্তি'] },
-          { id: 'ch-8', name: 'এসিড-ক্ষার সমতা', summary: 'এসিড ও ক্ষারকের বৈশিষ্ট্য, প্রশমন বিক্রিয়া ও pH স্কেল।', formulas: ['pH = -log[H⁺]'] },
-          { id: 'ch-9', name: 'খনিজ সম্পদ (ধাতু-অধাতু ও জীবাশ্ম)', summary: 'হাইড্রোকার্বন (অ্যালকেন, অ্যালকিন, অ্যালকাইন), পলিমারকরণ।', formulas: ['C_n H_(2n+2), C_n H_(2n)'] },
-          { id: 'ch-10', name: 'আমাদের জীবনে রসায়ন', summary: 'বেকিং পাউডার, ভিনেগার, সাবানায়ন ও ব্লিচিং পাউডার।', formulas: ['সাবানায়ন: তেল + ক্ষার -> সাবান + গ্লিসারিন'] }
+          { id: 'chemistry-1', name: 'রসায়নের ধারণা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-2', name: 'পদার্থের অবস্থা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-3', name: 'পদার্থের গঠন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-4', name: 'পর্যায় সারণি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-5', name: 'রাসায়নিক বন্ধন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-6', name: 'মোলের ধারণা ও রাসায়নিক গণনা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-7', name: 'রাসায়নিক বিক্রিয়া', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-8', name: 'রসায়ন ও শক্তি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-9', name: 'এসিড-ক্ষার সমতা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-10', name: 'খনিজ সম্পদ: ধাতু-অধাতু', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-11', name: 'খনিজ সম্পদ: জীবাশ্ম', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-12', name: 'আমাদের জীবনে রসায়ন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
         ]
       },
       {
@@ -394,19 +398,23 @@
         name: 'সাধারণ গণিত',
         color: 'text-amber-400',
         chapters: [
-          { id: 'gm-1', name: 'বাস্তব সংখ্যা', summary: 'মূলদ ও অমূলদ সংখ্যা, আবৃত্ত দশমিক ভগ্নাংশ।', formulas: ['√২ অমূলদ সংখ্যা প্রমাণ'] },
-          { id: 'gm-2', name: 'সেট ও ফাংশন', summary: 'সংযোগ ও ছেদ সেট, শক্তি সেট ও ডোমেন-রেঞ্জ।', formulas: ['P(A) উপাদান সংখ্যা = 2ⁿ'] },
-          { id: 'gm-3', name: 'বীজগাণিতিক রাশি', summary: 'বর্গ ও ঘনের সূত্রাবলী, মান নির্ণয় ও উৎপাদক।', formulas: ['(a+b)² = a² + 2ab + b²', 'a³+b³ = (a+b)(a²-ab+b²)'] },
-          { id: 'gm-4', name: 'সূচক ও লগারিদম', summary: 'সূচকীয় সমীকরণ, লগের ভিত্তি পরিবর্তন ও বৈজ্ঞানিক রূপ।', formulas: ['log(MN) = log M + log N', 'aᵐ × aⁿ = a^(m+n)'] },
-          { id: 'gm-5', name: 'একচলকবিশিষ্ট সমীকরণ', summary: 'সরল সমীকরণ গঠন ও সমাধান।', formulas: ['ax + b = 0'] },
-          { id: 'gm-6', name: 'জ্যামিতি (রেখা, কোণ, ত্রিভুজ ও বৃত্ত)', summary: 'পিথাগোরাসের উপপাদ্য, কেন্দ্রস্থ ও বৃত্তস্থ কোণ, স্পর্শক।', formulas: ['কেন্দ্রস্থ কোণ = ২ × বৃত্তস্থ কোণ'] },
-          { id: 'gm-7', name: 'ত্রিকোণমিতিক অনুপাত ও দূরত্ব-উচ্চতা', summary: 'sin, cos, tan অনুপাত ও উন্নতি-অবনতি কোণ।', formulas: ['sin²θ + cos²θ = 1', 'tanθ = লম্ব / ভূমি'] },
-          { id: 'gm-8', name: 'অনুপাত ও সমানুপাত', summary: 'যোজন-বিয়োজন ও ধারাবাহিক অনুপাত।', formulas: ['a/b = c/d => (a+b)/(a-b) = (c+d)/(c-d)'] },
-          { id: 'gm-9', name: 'সরল সহসমীকরণ', summary: 'প্রতিস্থাপন, অপনয়ন ও বজ্রগুণন পদ্ধতি।', formulas: ['বজ্রগুণন সমাধান সূত্র'] },
-          { id: 'gm-10', name: 'সসীম ধারা', summary: 'সমান্তর ও গুণোত্তর ধারা, n-তম পদ ও সমষ্টি।', formulas: ['Sn = (n/2)[2a + (n-1)d]', 'n-তম পদ = a + (n-1)d'] },
-          { id: 'gm-11', name: 'সদৃশতা ও ক্ষেত্রফল উপপাদ্য', summary: 'সদৃশ ত্রিভুজের ক্ষেত্রফল ও অনুরূপ বাহুর বর্গের অনুপাত।', formulas: ['অনুরূপ বাহুর বর্গ অনুপাত'] },
-          { id: 'gm-12', name: 'পরিমিতি', summary: 'সমবাহু ত্রিভুজ, বৃত্তের পরিধি, ক্ষেত্রফল ও বেলন।', formulas: ['সমবাহু ক্ষেত্রফল = (√3/4)a²', 'বৃত্ত ক্ষেত্রফল = πr²'] },
-          { id: 'gm-13', name: 'পরিসংখ্যান', summary: 'গড়, মধ্যক, প্রচুরক ও অজিভ রেখা অঙ্কন।', formulas: ['প্রচুরক = L + (f₁/(f₁+f₂)) × h'] }
+          { id: 'general_math-1', name: 'বাস্তব সংখ্যা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-2', name: 'সেট ও ফাংশন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-3', name: 'বীজগাণিতিক রাশি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-4', name: 'সূচক ও লগারিদম', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-5', name: 'একচলকবিশিষ্ট সমীকরণ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-6', name: 'রেখা, কোণ ও ত্রিভুজ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-7', name: 'ব্যবহারিক জ্যামিতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-8', name: 'বৃত্ত', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-9', name: 'ত্রিকোণমিতিক অনুপাত', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-10', name: 'দূরত্ব ও উচ্চতা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-11', name: 'বীজগাণিতিক অনুপাত ও সমানুপাত', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-12', name: 'দুই চলকবিশিষ্ট সরল সহসমীকরণ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-13', name: 'সসীম ধারা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-14', name: 'অনুপাত, সদৃশতা ও প্রতিসমতা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-15', name: 'ক্ষেত্রফল সম্পর্কিত উপপাদ্য ও সম্পাদ্য', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-16', name: 'পরিমিতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-17', name: 'পরিসংখ্যান', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
         ]
       },
       {
@@ -414,63 +422,20 @@
         name: 'উচ্চতর গণিত',
         color: 'text-purple-400',
         chapters: [
-          { id: 'hm-1', name: 'সেট ও ফাংশন', summary: 'এক-এক ও সার্বিক ফাংশন, বিপরীত ফাংশন f⁻¹(x)।', formulas: ['f(x₁) = f(x₂) => x₁ = x₂'] },
-          { id: 'hm-2', name: 'বীজগাণিতিক রাশি', summary: 'বহুপদী, আংশিক ভগ্নাংশ ও চক্রক্রমিক রাশি।', formulas: ['আংশিক ভগ্নাংশের ৫ নিয়ম'] },
-          { id: 'hm-3', name: 'জ্যামিতি ও জ্যামিতিক অঙ্কন', summary: 'এপোলিনিয়াসের উপপাদ্য ও টলেমির উপপাদ্য।', formulas: ['AB² + AC² = 2(AD² + BD²)'] },
-          { id: 'hm-4', name: 'সমীকরণ', summary: 'দ্বিঘাত সমীকরণ ও নিশ্চায়ক D = b² - 4ac।', formulas: ['x = (-b ± √(b²-4ac)) / 2a'] },
-          { id: 'hm-5', name: 'অসমতা', summary: 'পরম মান চিহ্ন সম্বলিত অসমতা ও সংখ্যারেখা।', formulas: ['|x| < a => -a < x < a'] },
-          { id: 'hm-6', name: 'অসীম ধারা', summary: 'অনন্ত গুণোত্তর ধারার অসীমতক সমষ্টি।', formulas: ['S_∞ = a / (1 - r) [|r| < 1]'] },
-          { id: 'hm-7', name: 'ত্রিকোণমিতি', summary: 'রেডিয়ান পরিমাপ ও s = rθ সূত্র।', formulas: ['s = rθ', '1 Radian = 180°/π'] },
-          { id: 'hm-8', name: 'সূচকীয় ও লগারিদমীয় ফাংশন', summary: 'e-ভিত্তিক ফাংশন ও ডোমেন-রেঞ্জ।', formulas: ['y = aˣ এর লেখচিত্র'] },
-          { id: 'hm-9', name: 'দ্বিপদী বিস্তৃতি', summary: 'প্যাসকেলের ত্রিভুজ ও সাধারণ পদ T_(r+1)।', formulas: ['T_(r+1) = ⁿC_r a^(n-r) b^r'] },
-          { id: 'hm-10', name: 'স্থানাঙ্ক জ্যামিতি', summary: 'বিন্দুদ্বয়ের দূরত্ব, ঢাল ও ত্রিভুজের ক্ষেত্রফল।', formulas: ['ঢাল m = (y₂ - y₁) / (x₂ - x₁)'] },
-          { id: 'hm-11', name: 'সমতলীয় ভেক্টর', summary: 'ভেক্টর যোগের ত্রিভুজ বিধি ও একক ভেক্টর।', formulas: ['â = a / |a|'] },
-          { id: 'hm-12', name: 'ঘন জ্যামিতি', summary: 'আয়তাকার ঘনবস্তু, কোণক ও গোলক।', formulas: ['গোলক আয়তন = (4/3)πr³'] },
-          { id: 'hm-13', name: 'সম্ভাবনা', summary: 'নমুনা ক্ষেত্র, প্রোবাবিলিটি ট্রি ও সম্ভাব্য ফলাফল।', formulas: ['P(E) = অনুকূল / মোট ঘটনা'] }
-        ]
-      },
-      {
-        id: 'bgs',
-        name: 'বাংলাদেশ ও বিশ্বপরিচয়',
-        color: 'text-rose-400',
-        chapters: [
-          { id: 'bgs-1', name: 'পূর্ব বাংলার আন্দোলন', summary: 'ভাষা আন্দোলন, যুক্তফ্রন্ট, ৬ দফা ও ৬৯-এর গণঅভ্যুত্থান।', formulas: ['৬ দফা = বাঙালির মুক্তির সনদ'] },
-          { id: 'bgs-2', name: 'স্বাধীন বাংলাদেশ', summary: '৭ই মার্চের ভাষণ, অপারেশন সার্চলাইট ও মুজিবনগর সরকার।', formulas: ['১৭ এপ্রিল ১৯৭১ মুজিবনগর শপথ'] },
-          { id: 'bgs-3', name: 'ভূপ্রকৃতি ও জলবায়ু', summary: 'টারশিয়ারি পাহাড়, প্লাইস্টোসিন বরেন্দ্র ও প্লাবন সমভূমি (৮০%)।', formulas: ['ক্রান্তীয় মৌসুমি জলবায়ু'] },
-          { id: 'bgs-4', name: 'নদ-নদী', summary: 'পদ্মা, মেঘনা, যমুনা নদী ব্যবস্থা ও নাব্য সংকট।', formulas: ['গোয়ালন্দে পদ্মা ও যমুনার মিলন'] },
-          { id: 'bgs-5', name: 'রাষ্ট্র ও নাগরিকতা', summary: 'রাষ্ট্রের ৪টি উপাদান ও সার্বভৌমত্ব।', formulas: ['চরম ক্ষমতা হলো সার্বভৌমত্ব'] },
-          { id: 'bgs-6', name: 'সরকারের অঙ্গসমূহ', summary: 'আইন বিভাগ (জাতীয় সংসদ), শাসন বিভাগ ও বিচার বিভাগ।', formulas: ['সংসদে সংরক্ষিত নারী আসন ৫০টি'] },
-          { id: 'bgs-7', name: 'জাতিসংঘ ও বাংলাদেশ', summary: 'জাতিসংঘের অঙ্গ ও শান্তিরক্ষা মিশনে অবদান।', formulas: ['১৭ সেপ্টেম্বর ১৯৭৪ সদস্যপদ (১৩৬তম)'] },
-          { id: 'bgs-8', name: 'এসডিজি (SDG)', summary: 'টেকসই উন্নয়ন অভীষ্টের ১৭টি লক্ষ্যমাত্রা (২০১৬-২০৩০)।', formulas: ['১৭টি গোল ও ১৬৯টি টার্গেট'] },
-          { id: 'bgs-9', name: 'জাতীয় সম্পদ ও অর্থনীতি', summary: 'ব্যক্তিগত, সমষ্টিগত ও জাতীয় সম্পদ, রাজস্ব আয়।', formulas: ['GDP, GNP ও মাথাপিছু আয়'] },
-          { id: 'bgs-10', name: 'সামাজিক পরিবর্তন', summary: 'শিল্পায়ন, নগরায়ণ ও নারী শিক্ষার প্রভাব।', formulas: ['শিক্ষা পরিবর্তনের প্রধান হাতিয়ার'] },
-          { id: 'bgs-11', name: 'সামাজিক সমস্যা', summary: 'দারিদ্র্য, বেকারত্ব, যৌতুক ও কিশোর অপরাধ।', formulas: ['কিশোর অপরাধ বয়সসীমা ৭-১৬'] },
-          { id: 'bgs-12', name: 'সাংস্কৃতিক বৈচিত্র্য', summary: 'ক্ষুদ্র নৃগোষ্ঠী (চাকমা, মারমা, গারো, সাঁওতাল) ও ঐতিহ্য।', formulas: ['গারো পরিবার মাতৃতান্ত্রিক'] }
-        ]
-      },
-      {
-        id: 'ict',
-        name: 'তথ্য ও যোগাযোগ প্রযুক্তি',
-        color: 'text-sky-400',
-        chapters: [
-          { id: 'ict-1', name: 'তথ্যপ্রযুক্তি ও বাংলাদেশ', summary: 'আইসিটির অগ্রদূত, ই-লার্নিং ও স্মার্ট বাংলাদেশ।', formulas: ['WWW এর জনক টিম বার্নার্স লি'] },
-          { id: 'ict-2', name: 'কম্পিউটার ও নিরাপত্তা', summary: 'ম্যালওয়্যার, পাসওয়ার্ড ও টু-ফ্যাক্টর অথেনটিকেশন (2FA)।', formulas: ['Malicious Software = Malware'] },
-          { id: 'ict-3', name: 'আমার শিক্ষায় ইন্টারনেট', summary: 'ডিজিটাল কনটেন্ট, ই-বুকের প্রকারভেদ ও ক্যারিয়ার।', formulas: ['EPUB, Interactive e-Book'] },
-          { id: 'ict-4', name: 'লেখালেখি ও হিসাব', summary: 'MS Word ফরম্যাটিং ও MS Excel স্প্রেডশিট সূত্র।', formulas: ['=SUM(A1:A10)'] },
-          { id: 'ict-5', name: 'মাল্টিমিডিয়া ও গ্রাফিক্স', summary: 'পাওয়ারপয়েন্ট স্লাইড ট্রানজিশন ও ফটোশপ লেয়ার।', formulas: ['নতুন স্লাইড: Ctrl + M'] },
-          { id: 'ict-6', name: 'ডাটাবেজ-এর ব্যবহার', summary: 'DBMS, ফিল্ড ও রেকর্ড, প্রাইমারি কি ও কুয়েরি।', formulas: ['প্রাইমারি কি = ইউনিক ফিল্ড'] }
-        ]
-      },
-      {
-        id: 'islamic_studies',
-        name: 'ইসলাম ও নৈতিক শিক্ষা',
-        color: 'text-teal-400',
-        chapters: [
-          { id: 'isl-1', name: 'আকাইদ ও নৈতিক জীবন', summary: 'তাওহিদ, শিরক, নিফাক, রিসালাত ও আখিরাত।', formulas: ['মুনাফিকের আলামত ৩টি'] },
-          { id: 'isl-2', name: 'শরীয়তের উৎস', summary: 'আল-কুরআন, সুন্নাহ (হাদিস), ইজমা ও কিয়াস।', formulas: ['দ্বিতীয় উৎস হলো সুন্নাহ'] },
-          { id: 'isl-3', name: 'ইবাদত', summary: 'সালাত, যাকাত (২.৫%), সওম ও হজ।', formulas: ['নিসাব পরিমাণ সম্পদে ২.৫% যাকাত'] },
-          { id: 'isl-4', name: 'আখলাক', summary: 'আখলাকে হামীদাহ (সৎ চরিত্র) ও আখলাকে যামীমাহ।', formulas: ['উত্তম চরিত্রের মর্যাদা'] },
-          { id: 'isl-5', name: 'আদর্শ জীবনচরিত', summary: 'হযরত মুহাম্মদ (সা.), মদিনা সনদ ও চার খলিফা।', formulas: ['মদিনা সনদ প্রথম লিখিত সংবিধান'] }
+          { id: 'higher_math-1', name: 'সেট ও ফাংশন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-2', name: 'বীজগাণিতিক রাশি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-3', name: 'জ্যামিতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-4', name: 'জ্যামিতিক অঙ্কন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-5', name: 'সমীকরণ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-6', name: 'অসমতা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-7', name: 'অসীম ধারা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-8', name: 'ত্রিকোণমিতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-9', name: 'সূচকীয় ও লগারিদমীয় ফাংশন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-10', name: 'দ্বিপদী বিস্তৃতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-11', name: 'স্থানাঙ্ক জ্যামিতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-12', name: 'সমতলীয় ভেক্টর', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-13', name: 'ঘন জ্যামিতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-14', name: 'সম্ভাবনা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
         ]
       },
       {
@@ -478,20 +443,68 @@
         name: 'জীববিজ্ঞান',
         color: 'text-green-400',
         chapters: [
-          { id: 'bio-1', name: 'জীবন পাঠ', summary: 'জীববিজ্ঞানের শাখাসমূহ ও দ্বিপদ নামকরণ পদ্ধতি।', formulas: ['হোমো স্যাপিয়েন্স (Homo sapiens)'] },
-          { id: 'bio-2', name: 'জীবকোষ ও টিস্যু', summary: 'মাইটোকন্ড্রিয়া (শক্তিঘর), প্লাস্টিড ও জাইলেম-ফ্লোয়েম।', formulas: ['পাওয়ার হাউস = মাইটোকন্ড্রিয়া'] },
-          { id: 'bio-3', name: 'কোষ বিভাজন', summary: 'অ্যামাইটোসিস, মাইটোসিস (৫ ধাপ) ও মিওসিস হ্রাসমূলক বিভাজন।', formulas: ['মেটাফেজে ক্রোমোজোম বিষুবীয় অঞ্চলে'] },
-          { id: 'bio-4', name: 'জীবনীশক্তি', summary: 'ATP (জৈব মুদ্রা), সালোকসংশ্লেষণ ও সবাত-অবাত শ্বসন।', formulas: ['6CO₂ + 12H₂O -> C₆H₁₂O₆ + 6O₂'] },
-          { id: 'bio-5', name: 'খাদ্য, পুষ্টি এবং পরিপাক', summary: 'খাদ্য উপাদান, সুষম খাদ্য, যকৃত ও ক্ষুদ্রান্ত্রে পরিপাক।', formulas: ['BMI = ওজন / (উচ্চতা)²'] },
-          { id: 'bio-6', name: 'জীবে পরিবহন', summary: 'উদ্ভিদে পানি শোষণ, প্রস্বেদন, রক্তকণিকা ও হৃদপিণ্ড।', formulas: ['সর্বজনীন গ্রহীতা AB+'] },
-          { id: 'bio-7', name: 'গ্যাসীয় বিনিময়', summary: 'ফুসফুস, অ্যালভিওলাস ও গ্যাসীয় ব্যাপন।', formulas: ['ফুসফুসের একক অ্যালভিওলাস'] },
-          { id: 'bio-8', name: 'রেচন প্রক্রিয়া', summary: 'বৃক্ক (কিডনি), নেফ্রনের গঠন ও ডায়ালাইসিস।', formulas: ['কিডনির একক নেফ্রন'] },
-          { id: 'bio-9', name: 'দৃঢ়তা প্রদান ও চলন', summary: 'কঙ্কালতন্ত্র (২০৬ হাড়), টেন্ডন ও সাইনোভিয়াল অস্থিসন্ধি।', formulas: ['পেশি ও হাড়ের সংযোগ = টেন্ডন'] },
-          { id: 'bio-10', name: 'সমন্বয়', summary: 'উদ্ভিদ হরমোন (ইথিলিন ফল পাকায়) ও স্নায়ুতন্ত্রের নিউরন।', formulas: ['গ্যাসীয় ফাইটোহরমোন ইথিলিন'] },
-          { id: 'bio-11', name: ' জীবের প্রজনন', summary: 'ফুলের স্তবকসমূহ, পরাগায়ন ও দ্বি-নিষেক।', formulas: ['শস্য ট্রিপ্লয়েড (3n)'] },
-          { id: 'bio-12', name: 'বংশগতি ও বিবর্তন', summary: 'DNA ডাবল হেলিক্স (A=T, G≡C) ও ক্রোমোজোম।', formulas: ['লিঙ্গ নির্ধারণে বাবার ভূমিকা (XY)'] },
-          { id: 'bio-13', name: 'জীবের পরিবেশ', summary: 'বাস্তুতন্ত্র, খাদ্য শৃঙ্খল ও পুষ্টি ট্রফিক লেভেল।', formulas: ['১০% শক্তি স্থানান্তর নিয়ম'] },
-          { id: 'bio-14', name: 'জীবপ্রযুক্তি', summary: 'টিস্যু কালচার, রিকম্বিনেন্ট DNA ও রেস্ট্রিকশন এনজাইম।', formulas: ['আণবিক কাঁচি = রেস্ট্রিকশন এনজাইম'] }
+          { id: 'biology-1', name: 'জীবন পাঠ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-2', name: 'জীবকোষ ও টিস্যু', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-3', name: 'কোষ বিভাজন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-4', name: 'জীবনীশক্তি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-5', name: 'খাদ্য, পুষ্টি এবং পরিপাক', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-6', name: 'জীবে পরিবহন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-7', name: 'গ্যাসীয় বিনিময়', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-8', name: 'রেচন প্রক্রিয়া', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-9', name: 'দৃঢ়তা প্রদান ও চলন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-10', name: 'সমন্বয়', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-11', name: 'জীবের প্রজনন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-12', name: 'জীবের বংশগতি ও বিবর্তন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-13', name: 'জীবের পরিবেশ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-14', name: 'জীবপ্রযুক্তি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
+        ]
+      },
+      {
+        id: 'bgs',
+        name: 'বাংলাদেশ ও বিশ্বপরিচয়',
+        color: 'text-rose-400',
+        chapters: [
+          { id: 'bgs-1', name: 'পূর্ব বাংলার আন্দোলন ও জাতীয়তাবাদের উত্থান (১৯৪৭-১৯৭০)', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-2', name: 'স্বাধীন বাংলাদেশ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-3', name: 'সৌরজগৎ ও ভূমণ্ডল', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-4', name: 'বাংলাদেশের ভূপ্রকৃতি ও জলবায়ু', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-5', name: 'বাংলাদেশের নদ-নদী ও প্রাকৃতিক সম্পদ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-6', name: 'রাষ্ট্র, নাগরিকতা ও আইন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-7', name: 'বাংলাদেশ সরকারের অঙ্গসমূহ ও প্রশাসন ব্যবস্থা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-8', name: 'বাংলাদেশের গণতন্ত্র ও নির্বাচন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-9', name: 'জাতিসংঘ ও বাংলাদেশ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-10', name: 'টেকসই উন্নয়ন অভীষ্ট (SDG)', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-11', name: 'জাতীয় সম্পদ ও অর্থনৈতিক ব্যবস্থা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-12', name: 'অর্থনৈতিক নির্দেশকসমূহ ও বাংলাদেশের অর্থনীতির প্রকৃতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-13', name: 'বাংলাদেশ সরকারের অর্থ ও ব্যাংক ব্যবস্থা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-14', name: 'বাংলাদেশের সামাজিক পরিবর্তন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-15', name: 'বাংলাদেশের সামাজিক সমস্যা ও এর প্রতিকার', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-16', name: 'বাংলাদেশের সাংস্কৃতিক বৈচিত্র্য', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
+        ]
+      },
+      {
+        id: 'ict',
+        name: 'তথ্য ও যোগাযোগ প্রযুক্তি',
+        color: 'text-sky-400',
+        chapters: [
+          { id: 'ict-1', name: 'তথ্য ও যোগাযোগ প্রযুক্তি এবং আমাদের বাংলাদেশ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'ict-2', name: 'কম্পিউটার ও কম্পিউটার ব্যবহারকারীর নিরাপত্তা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'ict-3', name: 'আমার শিক্ষায় ইন্টারনেট', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'ict-4', name: 'আমার লেখালেখি ও হিসাব', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'ict-5', name: 'মাল্টিমিডিয়া ও গ্রাফিক্স', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'ict-6', name: 'ডাটাবেজ এর ব্যবহার', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
+        ]
+      },
+      {
+        id: 'islamic_studies',
+        name: 'ইসলাম ও নৈতিক শিক্ষা',
+        color: 'text-teal-400',
+        chapters: [
+          { id: 'islamic_studies-1', name: 'আকাইদ ও নৈতিক জীবন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'islamic_studies-2', name: 'শরীয়তের উৎস', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'islamic_studies-3', name: 'ইবাদত', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'islamic_studies-4', name: 'আখলাক', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'islamic_studies-5', name: 'আদর্শ জীবনচরিত', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
         ]
       }
     ];
@@ -510,7 +523,7 @@
     ];
 
     // STATE
-    let progress = JSON.parse(localStorage.getItem('ssc_progress_standalone') || '{}');
+    let progress = JSON.parse(localStorage.getItem('ssc_progress_standalone_v2') || '{}');
     let currentSubjectFilter = 'all';
     let currentStatusFilter = 'all';
     let currentSearch = '';
@@ -518,7 +531,7 @@
 
     // Save Progress to localStorage
     function saveProgress() {
-      localStorage.setItem('ssc_progress_standalone', JSON.stringify(progress));
+      localStorage.setItem('ssc_progress_standalone_v2', JSON.stringify(progress));
       updateStats();
     }
 
@@ -576,7 +589,7 @@
       const container = document.getElementById('subject-filters');
       container.innerHTML = `
         <button onclick="setSubjectFilter('all')" class="px-3.5 py-1.5 rounded-xl border text-xs font-semibold whitespace-nowrap transition-all ${currentSubjectFilter === 'all' ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-slate-900 border-slate-800 text-slate-400'}">
-          সব বিষয় (৮৬)
+          সব বিষয় (৯৮)
         </button>
       ` + SUBJECTS.map(s => `
         <button onclick="setSubjectFilter('${s.id}')" class="px-3.5 py-1.5 rounded-xl border text-xs font-semibold whitespace-nowrap transition-all ${currentSubjectFilter === s.id ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-slate-900 border-slate-800 text-slate-400'}">
@@ -686,14 +699,16 @@
 
       document.getElementById('modal-subject-tag').innerText = subjectName;
       document.getElementById('modal-title').innerText = foundChap.name;
-      document.getElementById('modal-summary').innerText = foundChap.summary;
+      document.getElementById('modal-summary').innerText = foundChap.summary || '';
       document.getElementById('modal-notes').value = p.notes || '';
 
-      document.getElementById('modal-formulas').innerHTML = foundChap.formulas.map(f => `
+      document.getElementById('modal-formulas').innerHTML = foundChap.formulas.length
+        ? foundChap.formulas.map(f => `
         <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 font-mono text-indigo-300 text-xs">
           ${f}
         </div>
-      `).join('');
+      `).join('')
+        : '<div class="text-slate-500 text-xs">এই অধ্যায়ের নির্দিষ্ট সূত্র এখনো যোগ করা হয়নি।</div>';
 
       updateModalStatusUI(p.status || 'not_started');
       document.getElementById('chapter-modal').classList.remove('hidden');
@@ -742,8 +757,8 @@
           else if (p?.status === 'revision') revision++;
         });
       });
-      const pct = Math.round((mastered / 86) * 100);
-      document.getElementById('mastered-count-badge').innerText = `${mastered}/86`;
+      const pct = Math.round((mastered / 98) * 100);
+      document.getElementById('mastered-count-badge').innerText = `${mastered}/98`;
       document.getElementById('stat-mastered').innerText = mastered;
       document.getElementById('stat-reading').innerText = reading;
       document.getElementById('stat-revision').innerText = revision;
@@ -752,7 +767,7 @@
       const heroMastered = document.getElementById('hero-mastered');
       const ring = document.getElementById('progress-ring');
       if (heroProgress) heroProgress.innerText = `${pct}%`;
-      if (heroMastered) heroMastered.innerText = `${mastered} / ৮৬`;
+      if (heroMastered) heroMastered.innerText = `${mastered} / ৯৮`;
       if (ring) ring.style.setProperty('--progress', `${pct * 3.6}deg`);
     }
 
