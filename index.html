@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSC StudyHub - এসএসসি প্রস্তুতি ও চ্যাপ্টার ট্র্যাকার</title>
+  <meta name="theme-color" content="#090f1d">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
+    body {
+      font-family: 'Hind Siliguri', sans-serif;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16 gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-sky-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h1 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+              <span>SSC StudyHub</span>
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                ২০২৬ সংস্করণ
+              </span>
+            </h1>
+            <p class="text-[11px] text-slate-400 hidden sm:block">৮টি বিষয় ও ৮৬টি অধ্যায়ের সম্পূর্ণ প্রস্তুতি ট্র্যাকার</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 text-xs">
+          <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800">
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+            <span id="mastered-count-badge" class="text-emerald-400 font-bold">0/86</span>
+            <span class="text-slate-500">প্রস্তুত</span>
+          </div>
+          <button onclick="resetAllProgress()" class="p-2 rounded-xl text-slate-500 hover:text-slate-300 hover:bg-slate-800" title="প্রগ্রেস রিসেট">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="flex items-center gap-1 overflow-x-auto border-t border-slate-800/80 pt-1 pb-2">
+        <button onclick="switchTab('chapters')" id="tab-btn-chapters" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-indigo-600 text-white shadow-md">
+          <i data-lucide="layers" class="w-4 h-4"></i> অধ্যায় ট্র্যাকার (86)
+        </button>
+        <button onclick="switchTab('quiz')" id="tab-btn-quiz" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white">
+          <i data-lucide="award" class="w-4 h-4"></i> মক টেস্ট ও কুইজ
+        </button>
+        <button onclick="switchTab('formulas')" id="tab-btn-formulas" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white">
+          <i data-lucide="calculator" class="w-4 h-4"></i> সূত্র ভাণ্ডার
+        </button>
+        <button onclick="switchTab('pomodoro')" id="tab-btn-pomodoro" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white">
+          <i data-lucide="clock" class="w-4 h-4"></i> পোমোডোরো টাইমার
+        </button>
+        <button onclick="switchTab('goals')" id="tab-btn-goals" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white">
+          <i data-lucide="target" class="w-4 h-4"></i> ডেইলি রুটিন
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6">
+
+    <!-- 1. CHAPTERS TAB -->
+    <section id="view-chapters" class="space-y-6">
+      <!-- Stats bar -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
+          <div class="text-xs text-slate-400">সর্বমোট অধ্যায়</div>
+          <div class="text-2xl font-extrabold text-white mt-1">৮৬ টি</div>
+          <div class="text-[11px] text-slate-500">৮টি আবশ্যক বিষয়</div>
+        </div>
+        <div class="bg-slate-900/80 border border-emerald-500/20 rounded-2xl p-4">
+          <div class="text-xs text-emerald-400">সম্পূর্ণ প্রস্তুত</div>
+          <div id="stat-mastered" class="text-2xl font-extrabold text-emerald-400 mt-1">০</div>
+          <div id="stat-percent" class="text-[11px] text-emerald-500">০% সম্পন্ন</div>
+        </div>
+        <div class="bg-slate-900/80 border border-amber-500/20 rounded-2xl p-4">
+          <div class="text-xs text-amber-400">রিভিশন বাকি</div>
+          <div id="stat-revision" class="text-2xl font-extrabold text-amber-400 mt-1">০</div>
+          <div class="text-[11px] text-amber-500">টি অধ্যায়</div>
+        </div>
+        <div class="bg-slate-900/80 border border-sky-500/20 rounded-2xl p-4">
+          <div class="text-xs text-sky-400">বর্তমানে পড়ছি</div>
+          <div id="stat-reading" class="text-2xl font-extrabold text-sky-400 mt-1">০</div>
+          <div class="text-[11px] text-sky-500">টি অধ্যায়</div>
+        </div>
+      </div>
+
+      <!-- Subject Badges Carousel -->
+      <div class="space-y-2">
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">বিষয় নির্বাচন করুন:</div>
+        <div id="subject-filters" class="flex gap-2 overflow-x-auto pb-1 custom-scroll">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Search & Status Filter -->
+      <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-slate-900/60 border border-slate-800 p-3 rounded-2xl">
+        <div id="status-filter-pills" class="flex gap-1.5 overflow-x-auto text-xs">
+          <button onclick="setStatusFilter('all')" class="status-btn px-3 py-1.5 rounded-xl border bg-slate-800 border-slate-700 text-white font-bold" data-status="all">সব</button>
+          <button onclick="setStatusFilter('mastered')" class="status-btn px-3 py-1.5 rounded-xl border border-transparent text-slate-400" data-status="mastered">সম্পূর্ণ প্রস্তুত ★</button>
+          <button onclick="setStatusFilter('revision')" class="status-btn px-3 py-1.5 rounded-xl border border-transparent text-slate-400" data-status="revision">রিভিশন বাকি</button>
+          <button onclick="setStatusFilter('reading')" class="status-btn px-3 py-1.5 rounded-xl border border-transparent text-slate-400" data-status="reading">পড়ছি</button>
+          <button onclick="setStatusFilter('not_started')" class="status-btn px-3 py-1.5 rounded-xl border border-transparent text-slate-400" data-status="not_started">শুরু করিনি</button>
+          <button onclick="setStatusFilter('bookmarked')" class="status-btn px-3 py-1.5 rounded-xl border border-transparent text-slate-400" data-status="bookmarked">বুকমার্ক</button>
+        </div>
+        <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="অধ্যায় বা সূত্র খুঁজুন..." class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+      </div>
+
+      <!-- Chapter Cards Grid -->
+      <div id="chapters-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- 2. QUIZ TAB -->
+    <section id="view-quiz" class="hidden max-w-3xl mx-auto space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+          <i data-lucide="award" class="text-amber-400"></i> এসএসসি অধ্যায়ভিত্তিক মক টেস্ট
+        </h2>
+        <p class="text-xs text-slate-400 mb-6">বোর্ড প্রশ্ন ও অধ্যায়ের মৌলিক ধারণার ওপর ভিত্তি করে কুইজ দিন। এখানে কোনো MCQ option দেখানো হবে না—প্রথমে নিজে উত্তর ভেবে তারপর উত্তর দেখুন।</p>
+
+        <div id="quiz-setup" class="space-y-4">
+          <div>
+            <label class="text-xs font-bold text-slate-300 block mb-2">বিষয় নির্বাচন করুন:</label>
+            <select id="quiz-subject-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200">
+              <option value="all">সব বিষয় মিলিয়ে (কম্বাইন্ড)</option>
+              <option value="physics">পদার্থবিজ্ঞান</option>
+              <option value="chemistry">রসায়ন</option>
+              <option value="general_math">সাধারণ গণিত</option>
+              <option value="higher_math">উচ্চতর গণিত</option>
+              <option value="bgs">বাংলাদেশ ও বিশ্বপরিচয়</option>
+              <option value="ict">তথ্য ও যোগাযোগ প্রযুক্তি</option>
+              <option value="islamic_studies">ইসলাম ও নৈতিক শিক্ষা</option>
+              <option value="biology">জীববিজ্ঞান</option>
+            </select>
+          </div>
+          <button onclick="startQuiz()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/30">
+            পরীক্ষা শুরু করুন
+          </button>
+        </div>
+
+        <div id="quiz-box" class="hidden space-y-4">
+          <div class="flex items-center justify-between text-xs text-slate-400 border-b border-slate-800 pb-2">
+            <span id="quiz-counter">প্রশ্ন ১ / ৫</span>
+            <span id="quiz-subject-tag" class="text-indigo-400 font-semibold"></span>
+          </div>
+          <div id="quiz-question-text" class="text-base font-bold text-white py-2"></div>
+          <div id="quiz-answer-area" class="space-y-3">
+            <button id="quiz-reveal-btn" onclick="revealQuizAnswer()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl">
+              উত্তর দেখুন
+            </button>
+            <div id="quiz-answer" class="hidden p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-sm text-emerald-200"></div>
+          </div>
+          <div id="quiz-explanation" class="hidden p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300"></div>
+          <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl">
+            পরবর্তী প্রশ্ন
+          </button>
+        </div>
+
+        <div id="quiz-result" class="hidden text-center py-6 space-y-4">
+          <div class="text-2xl font-bold text-white">পরীক্ষা সম্পন্ন হয়েছে!</div>
+          <div id="quiz-final-score" class="text-3xl font-extrabold text-emerald-400">০ / ০</div>
+          <button onclick="resetQuiz()" class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl">
+            পুনরায় পরীক্ষা দিন
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. FORMULAS TAB -->
+    <section id="view-formulas" class="hidden max-w-4xl mx-auto space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2 mb-2">
+          <i data-lucide="calculator" class="text-amber-400"></i> এসএসসি সূত্র ভাণ্ডার (Formula Bank)
+        </h2>
+        <p class="text-xs text-slate-400 mb-6">পদার্থবিজ্ঞান, রসায়ন, সাধারণ গণিত ও উচ্চতর গণিতের প্রধান সূত্রসমূহ।</p>
+        <div id="formulas-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      </div>
+    </section>
+
+    <!-- 4. POMODORO TAB -->
+    <section id="view-pomodoro" class="hidden max-w-md mx-auto space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center space-y-6">
+        <div class="flex justify-center gap-2">
+          <button onclick="setPomodoroMode('study')" id="pomo-study-btn" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white">পড়াশোনা (২৫ মি.)</button>
+          <button onclick="setPomodoroMode('break')" id="pomo-break-btn" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400">বিরতি (৫ মি.)</button>
+        </div>
+
+        <div class="text-6xl font-extrabold font-mono text-white tracking-widest" id="pomo-display">
+          25:00
+        </div>
+
+        <div class="flex justify-center gap-4">
+          <button onclick="togglePomodoro()" id="pomo-start-btn" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-2xl shadow-xl shadow-indigo-600/30">
+            শুরু করুন
+          </button>
+          <button onclick="resetPomodoro()" class="p-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl">
+            <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="pt-4 border-t border-slate-800 text-xs text-slate-400">
+          আজকের মোট সেশন: <span id="pomo-session-count" class="text-emerald-400 font-bold">০</span> টি
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. GOALS TAB -->
+    <section id="view-goals" class="hidden max-w-2xl mx-auto space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <i data-lucide="target" class="text-violet-400"></i> আজকের পড়ার লক্ষ্য ও চেকলিস্ট
+        </h2>
+        <div class="flex gap-2">
+          <input type="text" id="goal-input" placeholder="আজকে কী পড়তে চান লিখুন..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-200">
+          <button onclick="addGoal()" class="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs rounded-xl">
+            যুক্ত করুন
+          </button>
+        </div>
+        <div id="goals-list" class="space-y-2 pt-2"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- CHAPTER DETAIL MODAL -->
+  <div id="chapter-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="p-5 border-b border-slate-800 flex items-start justify-between">
+        <div>
+          <span id="modal-subject-tag" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30"></span>
+          <h3 id="modal-title" class="text-xl font-bold text-white mt-1"></h3>
+        </div>
+        <button onclick="closeChapterModal()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-5 text-xs text-slate-300 flex-1 custom-scroll">
+        <!-- Status Changer -->
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between flex-wrap gap-2">
+          <span class="text-slate-400">প্রিপারেশন স্ট্যাটাস:</span>
+          <div class="flex gap-1.5" id="modal-status-buttons">
+            <button onclick="setModalChapterStatus('not_started')" class="px-2.5 py-1 rounded-lg border border-slate-800 text-slate-400 text-[11px]" data-mstatus="not_started">শুরু করিনি</button>
+            <button onclick="setModalChapterStatus('reading')" class="px-2.5 py-1 rounded-lg border border-slate-800 text-sky-400 text-[11px]" data-mstatus="reading">পড়ছি</button>
+            <button onclick="setModalChapterStatus('revision')" class="px-2.5 py-1 rounded-lg border border-slate-800 text-amber-400 text-[11px]" data-mstatus="revision">রিভিশন বাকি</button>
+            <button onclick="setModalChapterStatus('mastered')" class="px-2.5 py-1 rounded-lg border border-slate-800 text-emerald-400 text-[11px]" data-mstatus="mastered">সম্পূর্ণ প্রস্তুত ★</button>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="space-y-1">
+          <div class="font-bold text-slate-200">অধ্যায় সারসংক্ষেপ:</div>
+          <p id="modal-summary" class="leading-relaxed text-slate-400"></p>
+        </div>
+
+        <!-- Key Formulas -->
+        <div class="space-y-2">
+          <div class="font-bold text-slate-200">গুরুত্বপূর্ণ সূত্র ও পয়েন্ট:</div>
+          <div id="modal-formulas" class="space-y-1"></div>
+        </div>
+
+        <!-- Notes -->
+        <div class="space-y-1">
+          <div class="font-bold text-slate-200">ব্যক্তিগত নোট (স্বয়ংক্রিয় সেভ):</div>
+          <textarea id="modal-notes" oninput="saveModalNotes(this.value)" rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500" placeholder="এই অধ্যায়ের গুরুত্বপূর্ণ নোট বা ট্রিকস এখানে লিখে রাখুন..."></textarea>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-slate-800 bg-slate-950 flex justify-end">
+        <button onclick="closeChapterModal()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl">
+          সম্পন্ন
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPLETE DATASET & JAVASCRIPT SCRIPT -->
+  <script>
+    // 1. DATASET OF 8 SUBJECTS & ALL 86 CHAPTERS
+    const SUBJECTS = [
+      {
+        id: 'physics',
+        name: 'পদার্থবিজ্ঞান',
+        color: 'text-cyan-400',
+        chapters: [
+          { id: 'phy-1', name: 'ভৌত রাশি এবং পরিমাপ', summary: 'মৌলিক ও লব্ধ রাশি, স্লাইড ক্যালিপার্স, স্ক্রু গজ ও ভার্নিয়ার ধ্রুবক।', formulas: ['VC = s / n', 'L = M + (V × VC)'] },
+          { id: 'phy-2', name: 'গতি', summary: 'দূরত্ব, সরণ, দ্রুতি, বেগ, ত্বরণ ও গতির মৌলিক সমীকরণ।', formulas: ['v = u + at', 's = ut + 0.5at²', 'v² = u² + 2as'] },
+          { id: 'phy-3', name: 'বল', summary: 'নিউটনের গতির সূত্র, জড়তা, ভরবেগ ও ঘর্ষণ বল।', formulas: ['F = ma', 'm₁u₁ + m₂u₂ = m₁v₁ + m₂v₂'] },
+          { id: 'phy-4', name: 'কাজ, শক্তি ও ক্ষমতা', summary: 'গতিশক্তি, বিভবশক্তি, শক্তির সংরক্ষণশীলতা নীতি ও কর্মদক্ষতা।', formulas: ['W = Fs', 'Ek = 0.5mv²', 'Ep = mgh', 'η = (P_out / P_in) × 100%'] },
+          { id: 'phy-5', name: 'পদার্থের অবস্থা ও চাপ', summary: 'চাপ, ঘনত্ব, আর্কিমিডিসের সূত্র ও প্লবতা, প্যাসকেলের সূত্র।', formulas: ['P = hρg', 'B = Vρg', 'F₂/F₁ = A₂/A₁'] },
+          { id: 'phy-6', name: 'বস্তুর ওপর তাপের প্রভাব', summary: 'তাপমাত্রা স্কেল রূপান্তর, কঠিন পদার্থের প্রসারণ ও আপেক্ষিক তাপ।', formulas: ['C/5 = (F-32)/9 = (K-273)/5', 'Q = mcΔθ'] },
+          { id: 'phy-7', name: 'তরঙ্গ ও শব্দ', summary: 'তরঙ্গদৈর্ঘ্য, কম্পাঙ্ক, শব্দের বেগ ও প্রতিধ্বনি।', formulas: ['v = fλ', 'd = (v × t) / 2'] },
+          { id: 'phy-8', name: 'আলোর প্রতিফলন ও প্রতিসরণ', summary: 'দর্পণ সমীকরণ, প্রতিসরাঙ্ক, ক্রান্তি কোণ ও লেন্সের ক্ষমতা।', formulas: ['1/u + 1/v = 1/f', 'P = 1/f(m)'] },
+          { id: 'phy-9', name: 'স্থির ও চল বিদ্যুৎ', summary: 'কুলম্বের সূত্র, ওহমের সূত্র, তুল্যরোধ ও বিদ্যুৎ বিলের হিসাব।', formulas: ['V = IR', 'Unit(kWh) = (P × t)/1000', 'Rs = R₁ + R₂'] },
+          { id: 'phy-10', name: 'বিদ্যুতের চৌম্বক ক্রিয়া', summary: 'তাড়িতচৌম্বক আবেশ, সলিনয়েড ও ট্রান্সফরমার।', formulas: ['Vp/Vs = Np/Ns = Is/Ip'] },
+          { id: 'phy-11', name: 'আধুনিক পদার্থবিজ্ঞান ও ইলেকট্রনিক্স', summary: 'তেজস্ক্রিয়তা, p-n জংশন ডায়োড ও সেমিকন্ডাক্টর।', formulas: ['ডায়োডের একমুখীকরণ (Rectification)'] },
+          { id: 'phy-12', name: 'জীবন বাঁচাতে পদার্থবিজ্ঞান', summary: 'এক্স-রে, সিটি স্ক্যান, এমআরআই (MRI) ও আল্ট্রাসনোগ্রাফি।', formulas: ['শব্দোত্তর তরঙ্গ ও চৌম্বক ক্ষেত্র'] }
+        ]
+      },
+      {
+        id: 'chemistry',
+        name: 'রসায়ন',
+        color: 'text-emerald-400',
+        chapters: [
+          { id: 'ch-1', name: 'রসায়নের ধারণা', summary: 'রসায়নের পরিধি ও ঝুঁকিপূর্ণ পদার্থের হ্যাজার্ড প্রতীকসমূহ।', formulas: ['হ্যাজার্ড লেবেল ও সতর্কতা'] },
+          { id: 'ch-2', name: 'পদার্থের অবস্থা ও গঠন', summary: 'কণার গতিতত্ত্ব, ব্যাপন ও নিঃসরণ, পাতন ও উর্ধ্বপাতন।', formulas: ['গ্রাহামের ব্যাপন: r ∝ 1/√M'] },
+          { id: 'ch-3', name: 'পর্যায় সারণি', summary: 'পর্যায় ও গ্রুপ নির্ণয়, পর্যায়বৃত্ত ধর্ম ও ইলেকট্রন বিন্যাস।', formulas: ['পারমাণবিক ব্যাসার্ধ, আয়নীকরণ শক্তি'] },
+          { id: 'ch-4', name: 'রাসায়নিক বন্ধন', summary: 'যোজ্যতা ইলেকট্রন, আয়নিক বন্ধন, সমযোজী বন্ধন ও ধাতব বন্ধন।', formulas: ['অষ্টক ও দুইয়ের নিয়ম'] },
+          { id: 'ch-5', name: 'মোলের ধারণা ও রাসায়নিক গণনা', summary: 'মোল, মোলারিটি, শতকরা সংযুতি ও লিমিটিং বিক্রিয়ক।', formulas: ['n = W/M = V/22.4 = N/(6.023×10²³)', 'S = (1000W)/(MV)'] },
+          { id: 'ch-6', name: 'রাসায়নিক বিক্রিয়া', summary: 'জারণ-বিজারণ (Redox), জারণ সংখ্যা ও লা-শাতেলিয়ারের নীতি।', formulas: ['জারণ = ইলেকট্রন বর্জন, বিজারণ = গ্রহণ'] },
+          { id: 'ch-7', name: 'রসায়ন ও শক্তি', summary: 'তাপোৎপাদী ও তাপহারী বিক্রিয়া, বন্ধন শক্তি ও তড়িৎ বিশ্লেষণ।', formulas: ['ΔH = ভাঙার শক্তি - গড়ার শক্তি'] },
+          { id: 'ch-8', name: 'এসিড-ক্ষার সমতা', summary: 'এসিড ও ক্ষারকের বৈশিষ্ট্য, প্রশমন বিক্রিয়া ও pH স্কেল।', formulas: ['pH = -log[H⁺]'] },
+          { id: 'ch-9', name: 'খনিজ সম্পদ (ধাতু-অধাতু ও জীবাশ্ম)', summary: 'হাইড্রোকার্বন (অ্যালকেন, অ্যালকিন, অ্যালকাইন), পলিমারকরণ।', formulas: ['C_n H_(2n+2), C_n H_(2n)'] },
+          { id: 'ch-10', name: 'আমাদের জীবনে রসায়ন', summary: 'বেকিং পাউডার, ভিনেগার, সাবানায়ন ও ব্লিচিং পাউডার।', formulas: ['সাবানায়ন: তেল + ক্ষার -> সাবান + গ্লিসারিন'] }
+        ]
+      },
+      {
+        id: 'general_math',
+        name: 'সাধারণ গণিত',
+        color: 'text-amber-400',
+        chapters: [
+          { id: 'gm-1', name: 'বাস্তব সংখ্যা', summary: 'মূলদ ও অমূলদ সংখ্যা, আবৃত্ত দশমিক ভগ্নাংশ।', formulas: ['√২ অমূলদ সংখ্যা প্রমাণ'] },
+          { id: 'gm-2', name: 'সেট ও ফাংশন', summary: 'সংযোগ ও ছেদ সেট, শক্তি সেট ও ডোমেন-রেঞ্জ।', formulas: ['P(A) উপাদান সংখ্যা = 2ⁿ'] },
+          { id: 'gm-3', name: 'বীজগাণিতিক রাশি', summary: 'বর্গ ও ঘনের সূত্রাবলী, মান নির্ণয় ও উৎপাদক।', formulas: ['(a+b)² = a² + 2ab + b²', 'a³+b³ = (a+b)(a²-ab+b²)'] },
+          { id: 'gm-4', name: 'সূচক ও লগারিদম', summary: 'সূচকীয় সমীকরণ, লগের ভিত্তি পরিবর্তন ও বৈজ্ঞানিক রূপ।', formulas: ['log(MN) = log M + log N', 'aᵐ × aⁿ = a^(m+n)'] },
+          { id: 'gm-5', name: 'একচলকবিশিষ্ট সমীকরণ', summary: 'সরল সমীকরণ গঠন ও সমাধান।', formulas: ['ax + b = 0'] },
+          { id: 'gm-6', name: 'জ্যামিতি (রেখা, কোণ, ত্রিভুজ ও বৃত্ত)', summary: 'পিথাগোরাসের উপপাদ্য, কেন্দ্রস্থ ও বৃত্তস্থ কোণ, স্পর্শক।', formulas: ['কেন্দ্রস্থ কোণ = ২ × বৃত্তস্থ কোণ'] },
+          { id: 'gm-7', name: 'ত্রিকোণমিতিক অনুপাত ও দূরত্ব-উচ্চতা', summary: 'sin, cos, tan অনুপাত ও উন্নতি-অবনতি কোণ।', formulas: ['sin²θ + cos²θ = 1', 'tanθ = লম্ব / ভূমি'] },
+          { id: 'gm-8', name: 'অনুপাত ও সমানুপাত', summary: 'যোজন-বিয়োজন ও ধারাবাহিক অনুপাত।', formulas: ['a/b = c/d => (a+b)/(a-b) = (c+d)/(c-d)'] },
+          { id: 'gm-9', name: 'সরল সহসমীকরণ', summary: 'প্রতিস্থাপন, অপনয়ন ও বজ্রগুণন পদ্ধতি।', formulas: ['বজ্রগুণন সমাধান সূত্র'] },
+          { id: 'gm-10', name: 'সসীম ধারা', summary: 'সমান্তর ও গুণোত্তর ধারা, n-তম পদ ও সমষ্টি।', formulas: ['Sn = (n/2)[2a + (n-1)d]', 'n-তম পদ = a + (n-1)d'] },
+          { id: 'gm-11', name: 'সদৃশতা ও ক্ষেত্রফল উপপাদ্য', summary: 'সদৃশ ত্রিভুজের ক্ষেত্রফল ও অনুরূপ বাহুর বর্গের অনুপাত।', formulas: ['অনুরূপ বাহুর বর্গ অনুপাত'] },
+          { id: 'gm-12', name: 'পরিমিতি', summary: 'সমবাহু ত্রিভুজ, বৃত্তের পরিধি, ক্ষেত্রফল ও বেলন।', formulas: ['সমবাহু ক্ষেত্রফল = (√3/4)a²', 'বৃত্ত ক্ষেত্রফল = πr²'] },
+          { id: 'gm-13', name: 'পরিসংখ্যান', summary: 'গড়, মধ্যক, প্রচুরক ও অজিভ রেখা অঙ্কন।', formulas: ['প্রচুরক = L + (f₁/(f₁+f₂)) × h'] }
+        ]
+      },
+      {
+        id: 'higher_math',
+        name: 'উচ্চতর গণিত',
+        color: 'text-purple-400',
+        chapters: [
+          { id: 'hm-1', name: 'সেট ও ফাংশন', summary: 'এক-এক ও সার্বিক ফাংশন, বিপরীত ফাংশন f⁻¹(x)।', formulas: ['f(x₁) = f(x₂) => x₁ = x₂'] },
+          { id: 'hm-2', name: 'বীজগাণিতিক রাশি', summary: 'বহুপদী, আংশিক ভগ্নাংশ ও চক্রক্রমিক রাশি।', formulas: ['আংশিক ভগ্নাংশের ৫ নিয়ম'] },
+          { id: 'hm-3', name: 'জ্যামিতি ও জ্যামিতিক অঙ্কন', summary: 'এপোলিনিয়াসের উপপাদ্য ও টলেমির উপপাদ্য।', formulas: ['AB² + AC² = 2(AD² + BD²)'] },
+          { id: 'hm-4', name: 'সমীকরণ', summary: 'দ্বিঘাত সমীকরণ ও নিশ্চায়ক D = b² - 4ac।', formulas: ['x = (-b ± √(b²-4ac)) / 2a'] },
+          { id: 'hm-5', name: 'অসমতা', summary: 'পরম মান চিহ্ন সম্বলিত অসমতা ও সংখ্যারেখা।', formulas: ['|x| < a => -a < x < a'] },
+          { id: 'hm-6', name: 'অসীম ধারা', summary: 'অনন্ত গুণোত্তর ধারার অসীমতক সমষ্টি।', formulas: ['S_∞ = a / (1 - r) [|r| < 1]'] },
+          { id: 'hm-7', name: 'ত্রিকোণমিতি', summary: 'রেডিয়ান পরিমাপ ও s = rθ সূত্র।', formulas: ['s = rθ', '1 Radian = 180°/π'] },
+          { id: 'hm-8', name: 'সূচকীয় ও লগারিদমীয় ফাংশন', summary: 'e-ভিত্তিক ফাংশন ও ডোমেন-রেঞ্জ।', formulas: ['y = aˣ এর লেখচিত্র'] },
+          { id: 'hm-9', name: 'দ্বিপদী বিস্তৃতি', summary: 'প্যাসকেলের ত্রিভুজ ও সাধারণ পদ T_(r+1)।', formulas: ['T_(r+1) = ⁿC_r a^(n-r) b^r'] },
+          { id: 'hm-10', name: 'স্থানাঙ্ক জ্যামিতি', summary: 'বিন্দুদ্বয়ের দূরত্ব, ঢাল ও ত্রিভুজের ক্ষেত্রফল।', formulas: ['ঢাল m = (y₂ - y₁) / (x₂ - x₁)'] },
+          { id: 'hm-11', name: 'সমতলীয় ভেক্টর', summary: 'ভেক্টর যোগের ত্রিভুজ বিধি ও একক ভেক্টর।', formulas: ['â = a / |a|'] },
+          { id: 'hm-12', name: 'ঘন জ্যামিতি', summary: 'আয়তাকার ঘনবস্তু, কোণক ও গোলক।', formulas: ['গোলক আয়তন = (4/3)πr³'] },
+          { id: 'hm-13', name: 'সম্ভাবনা', summary: 'নমুনা ক্ষেত্র, প্রোবাবিলিটি ট্রি ও সম্ভাব্য ফলাফল।', formulas: ['P(E) = অনুকূল / মোট ঘটনা'] }
+        ]
+      },
+      {
+        id: 'bgs',
+        name: 'বাংলাদেশ ও বিশ্বপরিচয়',
+        color: 'text-rose-400',
+        chapters: [
+          { id: 'bgs-1', name: 'পূর্ব বাংলার আন্দোলন', summary: 'ভাষা আন্দোলন, যুক্তফ্রন্ট, ৬ দফা ও ৬৯-এর গণঅভ্যুত্থান।', formulas: ['৬ দফা = বাঙালির মুক্তির সনদ'] },
+          { id: 'bgs-2', name: 'স্বাধীন বাংলাদেশ', summary: '৭ই মার্চের ভাষণ, অপারেশন সার্চলাইট ও মুজিবনগর সরকার।', formulas: ['১৭ এপ্রিল ১৯৭১ মুজিবনগর শপথ'] },
+          { id: 'bgs-3', name: 'ভূপ্রকৃতি ও জলবায়ু', summary: 'টারশিয়ারি পাহাড়, প্লাইস্টোসিন বরেন্দ্র ও প্লাবন সমভূমি (৮০%)।', formulas: ['ক্রান্তীয় মৌসুমি জলবায়ু'] },
+          { id: 'bgs-4', name: 'নদ-নদী', summary: 'পদ্মা, মেঘনা, যমুনা নদী ব্যবস্থা ও নাব্য সংকট।', formulas: ['গোয়ালন্দে পদ্মা ও যমুনার মিলন'] },
+          { id: 'bgs-5', name: 'রাষ্ট্র ও নাগরিকতা', summary: 'রাষ্ট্রের ৪টি উপাদান ও সার্বভৌমত্ব।', formulas: ['চরম ক্ষমতা হলো সার্বভৌমত্ব'] },
+          { id: 'bgs-6', name: 'সরকারের অঙ্গসমূহ', summary: 'আইন বিভাগ (জাতীয় সংসদ), শাসন বিভাগ ও বিচার বিভাগ।', formulas: ['সংসদে সংরক্ষিত নারী আসন ৫০টি'] },
+          { id: 'bgs-7', name: 'জাতিসংঘ ও বাংলাদেশ', summary: 'জাতিসংঘের অঙ্গ ও শান্তিরক্ষা মিশনে অবদান।', formulas: ['১৭ সেপ্টেম্বর ১৯৭৪ সদস্যপদ (১৩৬তম)'] },
+          { id: 'bgs-8', name: 'এসডিজি (SDG)', summary: 'টেকসই উন্নয়ন অভীষ্টের ১৭টি লক্ষ্যমাত্রা (২০১৬-২০৩০)।', formulas: ['১৭টি গোল ও ১৬৯টি টার্গেট'] },
+          { id: 'bgs-9', name: 'জাতীয় সম্পদ ও অর্থনীতি', summary: 'ব্যক্তিগত, সমষ্টিগত ও জাতীয় সম্পদ, রাজস্ব আয়।', formulas: ['GDP, GNP ও মাথাপিছু আয়'] },
+          { id: 'bgs-10', name: 'সামাজিক পরিবর্তন', summary: 'শিল্পায়ন, নগরায়ণ ও নারী শিক্ষার প্রভাব।', formulas: ['শিক্ষা পরিবর্তনের প্রধান হাতিয়ার'] },
+          { id: 'bgs-11', name: 'সামাজিক সমস্যা', summary: 'দারিদ্র্য, বেকারত্ব, যৌতুক ও কিশোর অপরাধ।', formulas: ['কিশোর অপরাধ বয়সসীমা ৭-১৬'] },
+          { id: 'bgs-12', name: 'সাংস্কৃতিক বৈচিত্র্য', summary: 'ক্ষুদ্র নৃগোষ্ঠী (চাকমা, মারমা, গারো, সাঁওতাল) ও ঐতিহ্য।', formulas: ['গারো পরিবার মাতৃতান্ত্রিক'] }
+        ]
+      },
+      {
+        id: 'ict',
+        name: 'তথ্য ও যোগাযোগ প্রযুক্তি',
+        color: 'text-sky-400',
+        chapters: [
+          { id: 'ict-1', name: 'তথ্যপ্রযুক্তি ও বাংলাদেশ', summary: 'আইসিটির অগ্রদূত, ই-লার্নিং ও স্মার্ট বাংলাদেশ।', formulas: ['WWW এর জনক টিম বার্নার্স লি'] },
+          { id: 'ict-2', name: 'কম্পিউটার ও নিরাপত্তা', summary: 'ম্যালওয়্যার, পাসওয়ার্ড ও টু-ফ্যাক্টর অথেনটিকেশন (2FA)।', formulas: ['Malicious Software = Malware'] },
+          { id: 'ict-3', name: 'আমার শিক্ষায় ইন্টারনেট', summary: 'ডিজিটাল কনটেন্ট, ই-বুকের প্রকারভেদ ও ক্যারিয়ার।', formulas: ['EPUB, Interactive e-Book'] },
+          { id: 'ict-4', name: 'লেখালেখি ও হিসাব', summary: 'MS Word ফরম্যাটিং ও MS Excel স্প্রেডশিট সূত্র।', formulas: ['=SUM(A1:A10)'] },
+          { id: 'ict-5', name: 'মাল্টিমিডিয়া ও গ্রাফিক্স', summary: 'পাওয়ারপয়েন্ট স্লাইড ট্রানজিশন ও ফটোশপ লেয়ার।', formulas: ['নতুন স্লাইড: Ctrl + M'] },
+          { id: 'ict-6', name: 'ডাটাবেজ-এর ব্যবহার', summary: 'DBMS, ফিল্ড ও রেকর্ড, প্রাইমারি কি ও কুয়েরি।', formulas: ['প্রাইমারি কি = ইউনিক ফিল্ড'] }
+        ]
+      },
+      {
+        id: 'islamic_studies',
+        name: 'ইসলাম ও নৈতিক শিক্ষা',
+        color: 'text-teal-400',
+        chapters: [
+          { id: 'isl-1', name: 'আকাইদ ও নৈতিক জীবন', summary: 'তাওহিদ, শিরক, নিফাক, রিসালাত ও আখিরাত।', formulas: ['মুনাফিকের আলামত ৩টি'] },
+          { id: 'isl-2', name: 'শরীয়তের উৎস', summary: 'আল-কুরআন, সুন্নাহ (হাদিস), ইজমা ও কিয়াস।', formulas: ['দ্বিতীয় উৎস হলো সুন্নাহ'] },
+          { id: 'isl-3', name: 'ইবাদত', summary: 'সালাত, যাকাত (২.৫%), সওম ও হজ।', formulas: ['নিসাব পরিমাণ সম্পদে ২.৫% যাকাত'] },
+          { id: 'isl-4', name: 'আখলাক', summary: 'আখলাকে হামীদাহ (সৎ চরিত্র) ও আখলাকে যামীমাহ।', formulas: ['উত্তম চরিত্রের মর্যাদা'] },
+          { id: 'isl-5', name: 'আদর্শ জীবনচরিত', summary: 'হযরত মুহাম্মদ (সা.), মদিনা সনদ ও চার খলিফা।', formulas: ['মদিনা সনদ প্রথম লিখিত সংবিধান'] }
+        ]
+      },
+      {
+        id: 'biology',
+        name: 'জীববিজ্ঞান',
+        color: 'text-green-400',
+        chapters: [
+          { id: 'bio-1', name: 'জীবন পাঠ', summary: 'জীববিজ্ঞানের শাখাসমূহ ও দ্বিপদ নামকরণ পদ্ধতি।', formulas: ['হোমো স্যাপিয়েন্স (Homo sapiens)'] },
+          { id: 'bio-2', name: 'জীবকোষ ও টিস্যু', summary: 'মাইটোকন্ড্রিয়া (শক্তিঘর), প্লাস্টিড ও জাইলেম-ফ্লোয়েম।', formulas: ['পাওয়ার হাউস = মাইটোকন্ড্রিয়া'] },
+          { id: 'bio-3', name: 'কোষ বিভাজন', summary: 'অ্যামাইটোসিস, মাইটোসিস (৫ ধাপ) ও মিওসিস হ্রাসমূলক বিভাজন।', formulas: ['মেটাফেজে ক্রোমোজোম বিষুবীয় অঞ্চলে'] },
+          { id: 'bio-4', name: 'জীবনীশক্তি', summary: 'ATP (জৈব মুদ্রা), সালোকসংশ্লেষণ ও সবাত-অবাত শ্বসন।', formulas: ['6CO₂ + 12H₂O -> C₆H₁₂O₆ + 6O₂'] },
+          { id: 'bio-5', name: 'খাদ্য, পুষ্টি এবং পরিপাক', summary: 'খাদ্য উপাদান, সুষম খাদ্য, যকৃত ও ক্ষুদ্রান্ত্রে পরিপাক।', formulas: ['BMI = ওজন / (উচ্চতা)²'] },
+          { id: 'bio-6', name: 'জীবে পরিবহন', summary: 'উদ্ভিদে পানি শোষণ, প্রস্বেদন, রক্তকণিকা ও হৃদপিণ্ড।', formulas: ['সর্বজনীন গ্রহীতা AB+'] },
+          { id: 'bio-7', name: 'গ্যাসীয় বিনিময়', summary: 'ফুসফুস, অ্যালভিওলাস ও গ্যাসীয় ব্যাপন।', formulas: ['ফুসফুসের একক অ্যালভিওলাস'] },
+          { id: 'bio-8', name: 'রেচন প্রক্রিয়া', summary: 'বৃক্ক (কিডনি), নেফ্রনের গঠন ও ডায়ালাইসিস।', formulas: ['কিডনির একক নেফ্রন'] },
+          { id: 'bio-9', name: 'দৃঢ়তা প্রদান ও চলন', summary: 'কঙ্কালতন্ত্র (২০৬ হাড়), টেন্ডন ও সাইনোভিয়াল অস্থিসন্ধি।', formulas: ['পেশি ও হাড়ের সংযোগ = টেন্ডন'] },
+          { id: 'bio-10', name: 'সমন্বয়', summary: 'উদ্ভিদ হরমোন (ইথিলিন ফল পাকায়) ও স্নায়ুতন্ত্রের নিউরন।', formulas: ['গ্যাসীয় ফাইটোহরমোন ইথিলিন'] },
+          { id: 'bio-11', name: ' জীবের প্রজনন', summary: 'ফুলের স্তবকসমূহ, পরাগায়ন ও দ্বি-নিষেক।', formulas: ['শস্য ট্রিপ্লয়েড (3n)'] },
+          { id: 'bio-12', name: 'বংশগতি ও বিবর্তন', summary: 'DNA ডাবল হেলিক্স (A=T, G≡C) ও ক্রোমোজোম।', formulas: ['লিঙ্গ নির্ধারণে বাবার ভূমিকা (XY)'] },
+          { id: 'bio-13', name: 'জীবের পরিবেশ', summary: 'বাস্তুতন্ত্র, খাদ্য শৃঙ্খল ও পুষ্টি ট্রফিক লেভেল।', formulas: ['১০% শক্তি স্থানান্তর নিয়ম'] },
+          { id: 'bio-14', name: 'জীবপ্রযুক্তি', summary: 'টিস্যু কালচার, রিকম্বিনেন্ট DNA ও রেস্ট্রিকশন এনজাইম।', formulas: ['আণবিক কাঁচি = রেস্ট্রিকশন এনজাইম'] }
+        ]
+      }
+    ];
+
+    // 2. FORMULAS DATASET
+    const FORMULAS = [
+      { subject: 'পদার্থবিজ্ঞান', title: 'গতির মৌলিক সমীকরণ', eq: 'v = u + at  |  s = ut + ½at²  |  v² = u² + 2as' },
+      { subject: 'পদার্থবিজ্ঞান', title: 'নিউটনের ২য় সূত্র ও কাজ', eq: 'F = ma  |  W = Fs  |  Ek = ½mv²  |  Ep = mgh' },
+      { subject: 'পদার্থবিজ্ঞান', title: 'ওহমের সূত্র ও বিদ্যুৎ বিল', eq: 'V = IR  |  Unit(kWh) = (P × t) / 1000' },
+      { subject: 'রসায়ন', title: 'মোলের সমন্বিত সমীকরণ', eq: 'n = W/M = V(STP)/22.4 = N/(6.023 × 10²³)' },
+      { subject: 'রসায়ন', title: 'মোলারিটি ও এনথালপি', eq: 'S = (1000 × W) / (M × V_mL)  |  ΔH = B₁ - B₂' },
+      { subject: 'সাধারণ গণিত', title: 'সমান্তর ধারার সমষ্টি', eq: 'Sn = (n/2) [2a + (n - 1)d]  |  n-তম পদ = a + (n-1)d' },
+      { subject: 'সাধারণ গণিত', title: 'পরিমিতি ও সমবাহু ত্রিভুজ', eq: 'ক্ষেত্রফল = (√3/4)a²  |  বৃত্ত = πr²  |  পরিধি = 2πr' },
+      { subject: 'উচ্চতর গণিত', title: 'দ্বিঘাত সমীকরণ ও নিশ্চায়ক', eq: 'x = (-b ± √(b² - 4ac)) / 2a  |  D = b² - 4ac' },
+      { subject: 'উচ্চতর গণিত', title: 'অনন্ত গুণোত্তর ধারার সমষ্টি', eq: 'S_∞ = a / (1 - r)  [শর্ত: |r| < 1]' }
+    ];
+
+    // 3. SAMPLE QUIZ DATASET
+    const QUIZ_QUESTIONS = [
+      { subject: 'পদার্থবিজ্ঞান', q: 'বেগ-সময় (v-t) লেখচিত্রের ক্ষেত্রফল কী নির্দেশ করে?', opts: ['ত্বরণ', 'অতিক্রান্ত দূরত্ব', 'বল', 'ক্ষমতা'], ans: 1, exp: 'বেগ-সময় গ্রাফের নিচের ক্ষেত্রফল অতিক্রান্ত দূরত্বের সমান।' },
+      { subject: 'রসায়ন', q: 'প্রমাণ তাপমাত্রা ও চাপে (STP) ৪৪ গ্রাম CO₂ গ্যাসের আয়তন কত?', opts: ['22.4 L', '11.2 L', '44.8 L', '1 L'], ans: 0, exp: '৪৪ গ্রাম কার্বন ডাই-অক্সাইড মানে ১ মোল, যার STP তে আয়তন ২২.৪ লিটার।' },
+      { subject: 'সাধারণ গণিত', q: 'অর্ধবৃত্তস্থ কোণের মান কত ডিগ্রি?', opts: ['90°', '60°', '180°', '45°'], ans: 0, exp: 'বৃত্তের উপপাদ্য অনুযায়ী অর্ধবৃত্তস্থ কোণ সর্বদা এক সমকোণ বা ৯০ ডিগ্রি।' },
+      { subject: 'উচ্চতর গণিত', q: 'দ্বিঘাত সমীকরণের নিশ্চায়ক D = 0 হলে মূলদ্বয় কেমন হবে?', opts: ['বাস্তব ও সমান', 'বাস্তব ও অসমান', 'জটিল বা অবাস্তব', 'অমূলদ'], ans: 0, exp: 'D = 0 হলে মূলদ্বয় বাস্তব ও সমান হয়।' },
+      { subject: 'জীববিজ্ঞান', q: 'কোষের শক্তিঘর (Power House) বলা হয় কোনটিকে?', opts: ['মাইটোকন্ড্রিয়া', 'রাইবোসোম', 'লাইসোজোম', 'গলগি বডি'], ans: 0, exp: 'শ্বসনের মাধ্যমে খাদ্য থেকে শক্তি এটিপি আকারে মুক্ত করে মাইটোকন্ড্রিয়া।' }
+    ];
+
+    // STATE
+    let progress = JSON.parse(localStorage.getItem('ssc_progress_standalone') || '{}');
+    let currentSubjectFilter = 'all';
+    let currentStatusFilter = 'all';
+    let currentSearch = '';
+    let activeModalChapter = null;
+
+    // Save Progress to localStorage
+    function saveProgress() {
+      localStorage.setItem('ssc_progress_standalone', JSON.stringify(progress));
+      updateStats();
+    }
+
+    // Initialize View
+    function init() {
+      renderSubjectFilters();
+      renderChapters();
+      renderFormulas();
+      renderGoals();
+      updateStats();
+      lucide.createIcons();
+    }
+
+    // Switch Tabs
+    function switchTab(tabId) {
+      ['chapters', 'quiz', 'formulas', 'pomodoro', 'goals'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`tab-btn-${t}`);
+        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+        btn.classList.add('text-slate-400');
+      });
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+      activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+      activeBtn.classList.remove('text-slate-400');
+      lucide.createIcons();
+    }
+
+    // Render Subject Carousel
+    function renderSubjectFilters() {
+      const container = document.getElementById('subject-filters');
+      container.innerHTML = `
+        <button onclick="setSubjectFilter('all')" class="px-3.5 py-1.5 rounded-xl border text-xs font-semibold whitespace-nowrap transition-all ${currentSubjectFilter === 'all' ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-slate-900 border-slate-800 text-slate-400'}">
+          সব বিষয় (৮৬)
+        </button>
+      ` + SUBJECTS.map(s => `
+        <button onclick="setSubjectFilter('${s.id}')" class="px-3.5 py-1.5 rounded-xl border text-xs font-semibold whitespace-nowrap transition-all ${currentSubjectFilter === s.id ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-slate-900 border-slate-800 text-slate-400'}">
+          ${s.name} (${s.chapters.length})
+        </button>
+      `).join('');
+    }
+
+    function setSubjectFilter(id) {
+      currentSubjectFilter = id;
+      renderSubjectFilters();
+      renderChapters();
+    }
+
+    function setStatusFilter(status) {
+      currentStatusFilter = status;
+      document.querySelectorAll('.status-btn').forEach(b => {
+        if (b.dataset.status === status) {
+          b.className = 'status-btn px-3 py-1.5 rounded-xl border bg-slate-800 border-slate-700 text-white font-bold';
+        } else {
+          b.className = 'status-btn px-3 py-1.5 rounded-xl border border-transparent text-slate-400';
+        }
+      });
+      renderChapters();
+    }
+
+    function handleSearch(q) {
+      currentSearch = q.toLowerCase();
+      renderChapters();
+    }
+
+    // Render Chapter Cards
+    function renderChapters() {
+      const grid = document.getElementById('chapters-grid');
+      let chaptersList = [];
+
+      SUBJECTS.forEach(sub => {
+        if (currentSubjectFilter === 'all' || currentSubjectFilter === sub.id) {
+          sub.chapters.forEach((c, idx) => {
+            const p = progress[c.id] || { status: 'not_started', notes: '', bookmarked: false };
+            
+            const matchSearch = c.name.toLowerCase().includes(currentSearch) || sub.name.toLowerCase().includes(currentSearch);
+            let matchStatus = true;
+            if (currentStatusFilter === 'mastered') matchStatus = p.status === 'mastered';
+            else if (currentStatusFilter === 'reading') matchStatus = p.status === 'reading';
+            else if (currentStatusFilter === 'revision') matchStatus = p.status === 'revision';
+            else if (currentStatusFilter === 'not_started') matchStatus = !p.status || p.status === 'not_started';
+            else if (currentStatusFilter === 'bookmarked') matchStatus = !!p.bookmarked;
+
+            if (matchSearch && matchStatus) {
+              chaptersList.push({ ...c, subjectName: sub.name, subjectId: sub.id, chapterNum: idx + 1, prog: p });
+            }
+          });
+        }
+      });
+
+      if (chaptersList.length === 0) {
+        grid.innerHTML = '<div class="col-span-full text-center py-12 text-slate-500 text-xs">কোনো অধ্যায় খুঁজে পাওয়া যায়নি।</div>';
+        return;
+      }
+
+      grid.innerHTML = chaptersList.map(item => {
+        let badgeColor = 'bg-slate-800 text-slate-400 border-slate-700';
+        let badgeText = 'শুরু করিনি';
+        if (item.prog.status === 'reading') { badgeColor = 'bg-sky-500/10 text-sky-400 border-sky-500/30'; badgeText = 'পড়ছি'; }
+        if (item.prog.status === 'revision') { badgeColor = 'bg-amber-500/10 text-amber-400 border-amber-500/30'; badgeText = 'রিভিশন বাকি'; }
+        if (item.prog.status === 'mastered') { badgeColor = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'; badgeText = 'সম্পূর্ণ প্রস্তুত ★'; }
+
+        return `
+          <div onclick="openChapterModal('${item.id}', '${item.subjectName}')" class="bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 cursor-pointer transition-all flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
+                  ${item.subjectName} • অধ্যায় ${item.chapterNum}
+                </span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md border ${badgeColor}">
+                  ${badgeText}
+                </span>
+              </div>
+              <h3 class="text-base font-bold text-white group-hover:text-indigo-400 transition-colors mb-1">
+                ${item.name}
+              </h3>
+              <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed mb-4">
+                ${item.summary}
+              </p>
+            </div>
+            <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+              <span class="text-indigo-400 font-semibold group-hover:underline">বিস্তারিত ও নোট -></span>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    // Modal Handling
+    function openChapterModal(chapterId, subjectName) {
+      let foundChap = null;
+      for (const s of SUBJECTS) {
+        const c = s.chapters.find(x => x.id === chapterId);
+        if (c) { foundChap = c; break; }
+      }
+      if (!foundChap) return;
+
+      activeModalChapter = foundChap;
+      const p = progress[foundChap.id] || { status: 'not_started', notes: '' };
+
+      document.getElementById('modal-subject-tag').innerText = subjectName;
+      document.getElementById('modal-title').innerText = foundChap.name;
+      document.getElementById('modal-summary').innerText = foundChap.summary;
+      document.getElementById('modal-notes').value = p.notes || '';
+
+      document.getElementById('modal-formulas').innerHTML = foundChap.formulas.map(f => `
+        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 font-mono text-indigo-300 text-xs">
+          ${f}
+        </div>
+      `).join('');
+
+      updateModalStatusUI(p.status || 'not_started');
+      document.getElementById('chapter-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeChapterModal() {
+      document.getElementById('chapter-modal').classList.add('hidden');
+      activeModalChapter = null;
+      renderChapters();
+    }
+
+    function setModalChapterStatus(status) {
+      if (!activeModalChapter) return;
+      if (!progress[activeModalChapter.id]) progress[activeModalChapter.id] = {};
+      progress[activeModalChapter.id].status = status;
+      saveProgress();
+      updateModalStatusUI(status);
+    }
+
+    function saveModalNotes(notes) {
+      if (!activeModalChapter) return;
+      if (!progress[activeModalChapter.id]) progress[activeModalChapter.id] = {};
+      progress[activeModalChapter.id].notes = notes;
+      saveProgress();
+    }
+
+    function updateModalStatusUI(status) {
+      document.querySelectorAll('#modal-status-buttons button').forEach(btn => {
+        if (btn.dataset.mstatus === status) {
+          btn.classList.add('bg-indigo-600', 'text-white', 'font-bold');
+        } else {
+          btn.classList.remove('bg-indigo-600', 'text-white', 'font-bold');
+        }
+      });
+    }
+
+    // Stats Calculation
+    function updateStats() {
+      let mastered = 0, reading = 0, revision = 0;
+      SUBJECTS.forEach(s => {
+        s.chapters.forEach(c => {
+          const p = progress[c.id];
+          if (p?.status === 'mastered') mastered++;
+          else if (p?.status === 'reading') reading++;
+          else if (p?.status === 'revision') revision++;
+        });
+      });
+      const pct = Math.round((mastered / 86) * 100);
+      document.getElementById('mastered-count-badge').innerText = `${mastered}/86`;
+      document.getElementById('stat-mastered').innerText = mastered;
+      document.getElementById('stat-reading').innerText = reading;
+      document.getElementById('stat-revision').innerText = revision;
+      document.getElementById('stat-percent').innerText = `${pct}% সম্পন্ন`;
+    }
+
+    function resetAllProgress() {
+      if (confirm('আপনি কি সত্যিই সম্পূর্ণ প্রগ্রেস রিসেট করতে চান?')) {
+        progress = {};
+        saveProgress();
+        renderChapters();
+      }
+    }
+
+    // Render Formulas
+    function renderFormulas() {
+      document.getElementById('formulas-container').innerHTML = FORMULAS.map(f => `
+        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+          <div class="text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded w-max">${f.subject}</div>
+          <div class="text-sm font-bold text-white">${f.title}</div>
+          <div class="p-3 bg-slate-900 rounded-lg text-amber-300 font-mono text-xs text-center border border-slate-800 select-all">${f.eq}</div>
+        </div>
+      `).join('');
+    }
+
+    // Goals Handling
+    let goals = JSON.parse(localStorage.getItem('ssc_goals_standalone') || '[]');
+    function renderGoals() {
+      const container = document.getElementById('goals-list');
+      if (goals.length === 0) {
+        container.innerHTML = '<div class="text-xs text-slate-500 text-center py-4">কোনো টার্গেট নেই। ওপরে লিখে যোগ করুন!</div>';
+        return;
+      }
+      container.innerHTML = goals.map((g, i) => `
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3 text-xs">
+          <label class="flex items-center gap-2 cursor-pointer flex-1">
+            <input type="checkbox" ${g.done ? 'checked' : ''} onchange="toggleGoal(${i})" class="rounded border-slate-700">
+            <span class="${g.done ? 'line-through text-slate-500' : 'text-slate-200'}">${g.text}</span>
+          </label>
+          <button onclick="deleteGoal(${i})" class="text-slate-500 hover:text-rose-400">মুছুন</button>
+        </div>
+      `).join('');
+    }
+    function addGoal() {
+      const input = document.getElementById('goal-input');
+      if (!input.value.trim()) return;
+      goals.push({ text: input.value.trim(), done: false });
+      localStorage.setItem('ssc_goals_standalone', JSON.stringify(goals));
+      input.value = '';
+      renderGoals();
+    }
+    function toggleGoal(i) {
+      goals[i].done = !goals[i].done;
+      localStorage.setItem('ssc_goals_standalone', JSON.stringify(goals));
+      renderGoals();
+    }
+    function deleteGoal(i) {
+      goals.splice(i, 1);
+      localStorage.setItem('ssc_goals_standalone', JSON.stringify(goals));
+      renderGoals();
+    }
+
+    // Pomodoro Timer
+    let pomoTime = 25 * 60;
+    let pomoTimer = null;
+    let pomoCount = parseInt(localStorage.getItem('ssc_pomo_count') || '0', 10);
+    document.getElementById('pomo-session-count').innerText = pomoCount;
+
+    function setPomodoroMode(mode) {
+      clearInterval(pomoTimer);
+      pomoTimer = null;
+      document.getElementById('pomo-start-btn').innerText = 'শুরু করুন';
+      if (mode === 'study') {
+        pomoTime = 25 * 60;
+        document.getElementById('pomo-study-btn').className = 'px-4 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white';
+        document.getElementById('pomo-break-btn').className = 'px-4 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400';
+      } else {
+        pomoTime = 5 * 60;
+        document.getElementById('pomo-break-btn').className = 'px-4 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white';
+        document.getElementById('pomo-study-btn').className = 'px-4 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400';
+      }
+      updatePomoDisplay();
+    }
+
+    function togglePomodoro() {
+      if (pomoTimer) {
+        clearInterval(pomoTimer);
+        pomoTimer = null;
+        document.getElementById('pomo-start-btn').innerText = 'শুরু করুন';
+      } else {
+        document.getElementById('pomo-start-btn').innerText = 'থামান';
+        pomoTimer = setInterval(() => {
+          if (pomoTime > 0) {
+            pomoTime--;
+            updatePomoDisplay();
+          } else {
+            clearInterval(pomoTimer);
+            pomoTimer = null;
+            alert('পোমোডোরো সেশন শেষ!');
+            pomoCount++;
+            localStorage.setItem('ssc_pomo_count', pomoCount);
+            document.getElementById('pomo-session-count').innerText = pomoCount;
+            setPomodoroMode('break');
+          }
+        }, 1000);
+      }
+    }
+
+    function resetPomodoro() {
+      clearInterval(pomoTimer);
+      pomoTimer = null;
+      document.getElementById('pomo-start-btn').innerText = 'শুরু করুন';
+      pomoTime = 25 * 60;
+      updatePomoDisplay();
+    }
+
+    function updatePomoDisplay() {
+      const m = Math.floor(pomoTime / 60).toString().padStart(2, '0');
+      const s = (pomoTime % 60).toString().padStart(2, '0');
+      document.getElementById('pomo-display').innerText = `${m}:${s}`;
+    }
+
+    // Quiz Engine
+    let currentQIdx = 0;
+    let quizScore = 0;
+    let activeQuizList = [];
+
+    function startQuiz() {
+      const selected = document.getElementById('quiz-subject-select').value;
+      const subjectMap = {
+        physics: 'পদার্থবিজ্ঞান',
+        chemistry: 'রসায়ন',
+        general_math: 'সাধারণ গণিত',
+        higher_math: 'উচ্চতর গণিত',
+        bgs: 'বাংলাদেশ ও বিশ্বপরিচয়',
+        ict: 'তথ্য ও যোগাযোগ প্রযুক্তি',
+        islamic_studies: 'ইসলাম ও নৈতিক শিক্ষা',
+        biology: 'জীববিজ্ঞান'
+      };
+
+      const pool = selected === 'all'
+        ? QUIZ_QUESTIONS
+        : QUIZ_QUESTIONS.filter(q => q.subject === subjectMap[selected]);
+
+      activeQuizList = [...pool].sort(() => Math.random() - 0.5);
+      currentQIdx = 0;
+      quizScore = 0;
+
+      document.getElementById('quiz-setup').classList.add('hidden');
+      document.getElementById('quiz-result').classList.add('hidden');
+      document.getElementById('quiz-box').classList.remove('hidden');
+      loadQuizQuestion();
+    }
+
+    function loadQuizQuestion() {
+      const q = activeQuizList[currentQIdx];
+      document.getElementById('quiz-counter').innerText = `প্রশ্ন ${currentQIdx + 1} / ${activeQuizList.length}`;
+      document.getElementById('quiz-subject-tag').innerText = q.subject;
+      document.getElementById('quiz-question-text').innerText = `${currentQIdx + 1}. ${q.q}`;
+
+      const answer = document.getElementById('quiz-answer');
+      const revealBtn = document.getElementById('quiz-reveal-btn');
+      answer.innerHTML = '';
+      answer.classList.add('hidden');
+      revealBtn.classList.remove('hidden');
+      revealBtn.innerText = 'উত্তর দেখুন';
+
+      document.getElementById('quiz-explanation').classList.add('hidden');
+      document.getElementById('quiz-next-btn').classList.add('hidden');
+    }
+
+    function revealQuizAnswer() {
+      const q = activeQuizList[currentQIdx];
+      const answer = document.getElementById('quiz-answer');
+      const revealBtn = document.getElementById('quiz-reveal-btn');
+
+      answer.innerHTML = `<strong>সঠিক উত্তর:</strong> ${q.opts[q.ans]}<br><span class="text-slate-300">${q.exp}</span>`;
+      answer.classList.remove('hidden');
+      revealBtn.classList.add('hidden');
+      document.getElementById('quiz-next-btn').classList.remove('hidden');
+    }
+
+    function nextQuizQuestion() {
+      if (currentQIdx < activeQuizList.length - 1) {
+        currentQIdx++;
+        loadQuizQuestion();
+      } else {
+        document.getElementById('quiz-box').classList.add('hidden');
+        document.getElementById('quiz-result').classList.remove('hidden');
+        document.getElementById('quiz-final-score').innerText = 'কুইজ সম্পন্ন';
+      }
+    }
+
+    function resetQuiz() {
+      document.getElementById('quiz-setup').classList.remove('hidden');
+      document.getElementById('quiz-result').classList.add('hidden');
+    }
+
+    // Run on load
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
