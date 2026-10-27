@@ -41,6 +41,8 @@
     .progress-ring > div { position: relative; z-index: 1; text-align: center; color: #fff; line-height: 1; }
     .progress-ring span { display:block; font-size: 18px; font-weight: 800; }
     .progress-ring small { display:block; margin-top: 4px; font-size: 8px; opacity:.8; }
+    
+    /* Light Mode Styles */
     .light-mode {
       background: #f5f7fb !important;
       color: #0f172a !important;
@@ -49,10 +51,15 @@
       background: rgba(255,255,255,.88) !important;
       border-color: #e2e8f0 !important;
     }
-    .light-mode [class*="bg-slate-950"],
-    .light-mode [class*="bg-slate-900"],
-    .light-mode [class*="bg-slate-800"] {
+    .light-mode [class*="bg-slate-950"] {
+      background-color: #f8fafc !important;
+    }
+    .light-mode [class*="bg-slate-900"] {
       background-color: #ffffff !important;
+    }
+    .light-mode [class*="bg-slate-850"],
+    .light-mode [class*="bg-slate-800"] {
+      background-color: #f1f5f9 !important;
     }
     .light-mode [class*="border-slate-800"],
     .light-mode [class*="border-slate-700"] {
@@ -68,12 +75,12 @@
     }
     .light-mode [class*="text-slate-400"] { color: #64748b !important; }
     .light-mode [class*="text-slate-500"] { color: #94a3b8 !important; }
-    .light-mode [class*="hover:bg-slate-800"]:hover { background-color: #f1f5f9 !important; }
+    .light-mode [class*="hover:bg-slate-800"]:hover { background-color: #e2e8f0 !important; }
     .light-mode .bg-indigo-600,
     .light-mode .bg-emerald-600 { color: #fff !important; }
     .light-mode .progress-ring::before { background: #4f46e5; }
     .light-mode input, .light-mode select, .light-mode textarea {
-      color: #0f172a !important; background-color: #fff !important;
+      color: #0f172a !important; background-color: #ffffff !important; border-color: #cbd5e1 !important;
     }
     .light-mode .custom-scroll::-webkit-scrollbar-track { background:#e2e8f0; }
     .light-mode .custom-scroll::-webkit-scrollbar-thumb { background:#cbd5e1; }
@@ -120,13 +127,13 @@
         <button onclick="switchTab('chapters')" id="tab-btn-chapters" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-indigo-600 text-white shadow-md">
           <i data-lucide="layers" class="w-4 h-4"></i> অধ্যায় ট্র্যাকার (98)
         </button>
-        <button onclick="switchTab('formulas')" id="tab-btn-formulas" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white">
+        <button onclick="switchTab('formulas')" id="tab-btn-formulas" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white hover:bg-slate-800/60">
           <i data-lucide="calculator" class="w-4 h-4"></i> সূত্র ভাণ্ডার
         </button>
-        <button onclick="switchTab('pomodoro')" id="tab-btn-pomodoro" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white">
+        <button onclick="switchTab('pomodoro')" id="tab-btn-pomodoro" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white hover:bg-slate-800/60">
           <i data-lucide="clock" class="w-4 h-4"></i> পোমোডোরো টাইমার
         </button>
-        <button onclick="switchTab('goals')" id="tab-btn-goals" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white">
+        <button onclick="switchTab('goals')" id="tab-btn-goals" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white hover:bg-slate-800/60">
           <i data-lucide="target" class="w-4 h-4"></i> ডেইলি রুটিন
         </button>
       </div>
@@ -287,7 +294,7 @@
           <i data-lucide="target" class="text-violet-400"></i> আজকের পড়ার লক্ষ্য ও চেকলিস্ট
         </h2>
         <div class="flex gap-2">
-          <input type="text" id="goal-input" placeholder="আজকে কী পড়তে চান লিখুন..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-200">
+          <input type="text" id="goal-input" onkeydown="if(event.key==='Enter') addGoal()" placeholder="আজকে কী পড়তে চান লিখুন..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-200">
           <button onclick="addGoal()" class="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs rounded-xl">
             যুক্ত করুন
           </button>
@@ -567,6 +574,13 @@
       renderGoals();
       updateStats();
       lucide.createIcons();
+
+      // Close modal on Escape key
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeChapterModal();
+        }
+      });
     }
 
     // Switch Tabs
@@ -891,9 +905,9 @@
     window.addEventListener('DOMContentLoaded', init);
   </script>
   <footer class="mt-10 border-t border-slate-200/70 dark:border-slate-800/70 pt-5 pb-6 text-center">
-  <p class="text-sm text-slate-500 dark:text-slate-400">
-    © turabi_alam
-  </p>
-</footer>
+    <p class="text-sm text-slate-500 dark:text-slate-400">
+      © turabi_alam
+    </p>
+  </footer>
 </body>
 </html>
