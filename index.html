@@ -13,9 +13,9 @@
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap');
     body {
-      font-family: 'Hind Siliguri', sans-serif;
+      font-family: 'Noto Sans Bengali', 'Hind Siliguri', sans-serif;
     }
     .custom-scroll::-webkit-scrollbar {
       width: 6px;
@@ -97,6 +97,20 @@
     #chapters-grid > div { transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease; }
     button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible { outline:2px solid #818cf8; outline-offset:2px; }
     .status-btn { white-space:nowrap; }
+    /* Refined filters, chapter progress and app-owned confirmation dialog */
+    #subject-filters { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); }
+    #subject-filters button { min-height:58px; text-align:left; white-space:normal; }
+    .filter-panel { background:rgba(15,23,42,.72); border:1px solid rgba(148,163,184,.18); }
+    .chapter-status-action { cursor:pointer; }
+    .chapter-progress-track { height:5px; border-radius:999px; overflow:hidden; background:#334155; }
+    .chapter-progress-fill { height:100%; border-radius:999px; transition:width .25s ease; }
+    #confirm-modal { position:fixed; inset:0; z-index:95; display:none; align-items:center; justify-content:center; padding:16px; background:rgba(2,6,23,.78); backdrop-filter:blur(8px); }
+    #confirm-modal.show { display:flex; }
+    #confirm-modal .confirm-box { width:100%; max-width:420px; padding:24px; border-radius:22px; background:#111827; border:1px solid #334155; box-shadow:0 25px 80px rgba(0,0,0,.45); }
+    .light-mode #confirm-modal .confirm-box { background:#fff; color:#0f172a; }
+    .light-mode .filter-panel { background:rgba(255,255,255,.88); border-color:#e2e8f0; }
+    .light-mode .chapter-progress-track { background:#e2e8f0; }
+    @media(max-width:640px) { #subject-filters { grid-template-columns:repeat(2,minmax(0,1fr)); } }
     #study-floating { position:fixed;right:16px;bottom:16px;z-index:45;display:none;align-items:center;gap:9px;padding:11px 15px;border-radius:999px;background:#312e81;color:#fff;border:1px solid rgba(165,180,252,.55);box-shadow:0 10px 30px rgba(49,46,129,.35);font-size:12px;font-weight:800;cursor:pointer; }
     #study-floating.show { display:flex; }
     #study-floating.running { animation:focusGlow 1.8s ease-in-out infinite; }
@@ -108,6 +122,92 @@
     #reset-modal .reset-box { width:100%;max-width:390px;padding:24px;border-radius:22px;background:#111827;border:1px solid #334155;box-shadow:0 25px 80px rgba(0,0,0,.45); }
     .light-mode #reset-modal .reset-box { background:#fff;color:#0f172a; }
     @media(max-width:640px) { #study-floating { right:10px;bottom:10px;padding:10px 12px; } #chapters-grid > div { min-height:0; } }
+
+  
+    /* Colorful dark theme enhancement: richer accents, while keeping the dark base */
+    body:not(.light-mode) {
+      background-color:#080d1b;
+      background-image:
+        radial-gradient(ellipse at 8% 0%, rgba(124,58,237,.22), transparent 32%),
+        radial-gradient(ellipse at 92% 8%, rgba(6,182,212,.15), transparent 30%),
+        radial-gradient(ellipse at 50% 100%, rgba(236,72,153,.08), transparent 38%);
+    }
+    body:not(.light-mode) header.sticky {
+      background-image:linear-gradient(100deg,rgba(15,23,42,.97),rgba(30,27,75,.94),rgba(15,23,42,.97));
+      border-bottom-color:rgba(129,140,248,.24)!important;
+    }
+    body:not(.light-mode) #view-chapters > .relative:first-child {
+      background-image:linear-gradient(120deg,rgba(79,70,229,.22),rgba(14,165,233,.12),rgba(217,70,239,.10));
+      border-color:rgba(129,140,248,.30);
+      box-shadow:0 18px 50px rgba(49,46,129,.14);
+    }
+    body:not(.light-mode) .filter-panel {
+      background:linear-gradient(135deg,rgba(30,41,59,.88),rgba(17,24,39,.92),rgba(49,46,129,.14));
+      border-color:rgba(129,140,248,.25);
+      box-shadow:0 12px 35px rgba(2,6,23,.14);
+    }
+    body:not(.light-mode) #subject-filters button {
+      background-image:linear-gradient(145deg,rgba(30,41,59,.96),rgba(15,23,42,.96));
+      border-color:rgba(148,163,184,.22);
+      box-shadow:inset 0 1px rgba(255,255,255,.025);
+      transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+    }
+    body:not(.light-mode) #subject-filters button:nth-child(6n+1) { border-bottom:2px solid #818cf8; }
+    body:not(.light-mode) #subject-filters button:nth-child(6n+2) { border-bottom:2px solid #22d3ee; }
+    body:not(.light-mode) #subject-filters button:nth-child(6n+3) { border-bottom:2px solid #34d399; }
+    body:not(.light-mode) #subject-filters button:nth-child(6n+4) { border-bottom:2px solid #fbbf24; }
+    body:not(.light-mode) #subject-filters button:nth-child(6n+5) { border-bottom:2px solid #f472b6; }
+    body:not(.light-mode) #subject-filters button:nth-child(6n) { border-bottom:2px solid #fb923c; }
+    body:not(.light-mode) #subject-filters button:hover {
+      transform:translateY(-2px);
+      border-color:rgba(165,180,252,.7);
+      box-shadow:0 10px 24px rgba(79,70,229,.16);
+    }
+    body:not(.light-mode) #subject-filters button.bg-indigo-600 {
+      background-image:linear-gradient(135deg,#4f46e5,#7c3aed 58%,#a21caf);
+      border-color:#a5b4fc;
+    }
+    body:not(.light-mode) #chapters-grid > article {
+      position:relative;
+      overflow:hidden;
+      background:linear-gradient(155deg,rgba(30,41,59,.96),rgba(15,23,42,.98) 62%,rgba(30,27,75,.25));
+      border-color:rgba(148,163,184,.20);
+      box-shadow:0 10px 28px rgba(2,6,23,.18);
+    }
+    body:not(.light-mode) #chapters-grid > article::before {
+      content:"";
+      position:absolute;
+      top:0;left:0;right:0;height:3px;
+      background:linear-gradient(90deg,#818cf8,#22d3ee,#34d399,#fbbf24,#f472b6);
+      opacity:.85;
+    }
+    body:not(.light-mode) #chapters-grid > article:hover {
+      border-color:rgba(129,140,248,.48);
+      box-shadow:0 16px 38px rgba(79,70,229,.16);
+    }
+    body:not(.light-mode) .chapter-progress-track { background:rgba(148,163,184,.18); }
+    body:not(.light-mode) .chapter-progress-fill {
+      background-image:linear-gradient(90deg,#818cf8,#22d3ee)!important;
+      box-shadow:0 0 12px rgba(34,211,238,.24);
+    }
+    body:not(.light-mode) #chapters-grid > article .bg-emerald-500\/10 { background-color:rgba(16,185,129,.16); }
+    body:not(.light-mode) #chapters-grid > article .bg-sky-500\/10 { background-color:rgba(14,165,233,.16); }
+    body:not(.light-mode) #chapters-grid > article .bg-indigo-500\/10 { background-color:rgba(99,102,241,.17); }
+    body:not(.light-mode) button.bg-indigo-600 {
+      background-image:linear-gradient(135deg,#4f46e5,#7c3aed);
+      box-shadow:0 5px 16px rgba(99,102,241,.18);
+    }
+    body:not(.light-mode) button.bg-emerald-600 {
+      background-image:linear-gradient(135deg,#059669,#0d9488);
+    }
+    body:not(.light-mode) input:focus,body:not(.light-mode) select:focus,body:not(.light-mode) textarea:focus {
+      border-color:#818cf8!important;
+      box-shadow:0 0 0 3px rgba(129,140,248,.12);
+    }
+    body:not(.light-mode) .progress-ring {
+      background:conic-gradient(#a78bfa var(--progress,0deg),rgba(148,163,184,.18) 0deg);
+      box-shadow:0 0 28px rgba(124,58,237,.18);
+    }
 
   </style>
 </head>
@@ -152,9 +252,6 @@
         <button onclick="switchTab('chapters')" id="tab-btn-chapters" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-indigo-600 text-white shadow-md">
           <i data-lucide="layers" class="w-4 h-4"></i> অধ্যায় ট্র্যাকার
         </button>
-        <button onclick="switchTab('formulas')" id="tab-btn-formulas" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white hover:bg-slate-800/60">
-          <i data-lucide="calculator" class="w-4 h-4"></i> সূত্র ভাণ্ডার
-        </button>
         <button onclick="switchTab('pomodoro')" id="tab-btn-pomodoro" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all text-slate-400 hover:text-white hover:bg-slate-800/60">
           <i data-lucide="clock" class="w-4 h-4"></i> পোমোডোরো টাইমার
         </button>
@@ -183,13 +280,10 @@
               <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> SSC StudyHub • Smart Study Dashboard
             </div>
             <h2 class="text-2xl sm:text-3xl font-extrabold text-white leading-tight">আজকের পড়াশোনা, এক জায়গায়।</h2>
-            <p class="mt-2 text-sm text-indigo-100/90 max-w-xl">অধ্যায় শেষ করুন, নোট রাখুন, গুরুত্বপূর্ণ সূত্র রিভিশন দিন এবং Focus Timer দিয়ে পড়ার সময়টা গুছিয়ে নিন।</p>
+            <p class="mt-2 text-sm text-indigo-100/90 max-w-xl">অধ্যায়ের অগ্রগতি ট্র্যাক করুন, নোট রাখুন এবং Focus Timer দিয়ে পড়ার সময়টা গুছিয়ে নিন।</p>
             <div class="flex flex-wrap gap-2 mt-5">
               <button onclick="focusSearch()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-indigo-700 text-xs font-bold shadow-lg hover:bg-indigo-50 transition-all">
                 <i data-lucide="search" class="w-4 h-4"></i> অধ্যায় খুঁজুন
-              </button>
-              <button onclick="switchTab('formulas')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white text-xs font-bold hover:bg-white/15 transition-all">
-                <i data-lucide="calculator" class="w-4 h-4"></i> সূত্র দেখুন
               </button>
               <button onclick="switchTab('pomodoro')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white text-xs font-bold hover:bg-white/15 transition-all">
                 <i data-lucide="timer" class="w-4 h-4"></i> Focus Timer
@@ -211,80 +305,83 @@
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
           <div class="text-xs text-slate-400">সর্বমোট অধ্যায়</div>
-          <div class="text-2xl font-extrabold text-white mt-1">৯৮ টি</div>
-          <div class="text-[11px] text-slate-500">৮টি আবশ্যক বিষয়</div>
+          <div id="stat-total" class="text-2xl font-extrabold text-white mt-1">৯৮ টি</div>
+          <div class="text-[11px] text-slate-500">সব বিষয় মিলিয়ে</div>
         </div>
         <div class="bg-slate-900/80 border border-emerald-500/20 rounded-2xl p-4">
-          <div class="text-xs text-emerald-400">সম্পূর্ণ প্রস্তুত</div>
+          <div class="text-xs text-emerald-400">সম্পন্ন অধ্যায়</div>
           <div id="stat-mastered" class="text-2xl font-extrabold text-emerald-400 mt-1">০</div>
           <div id="stat-percent" class="text-[11px] text-emerald-500">০% সম্পন্ন</div>
         </div>
-        <div class="bg-slate-900/80 border border-amber-500/20 rounded-2xl p-4">
-          <div class="text-xs text-amber-400">রিভিশন বাকি</div>
-          <div id="stat-revision" class="text-2xl font-extrabold text-amber-400 mt-1">০</div>
-          <div class="text-[11px] text-amber-500">টি অধ্যায়</div>
-        </div>
         <div class="bg-slate-900/80 border border-sky-500/20 rounded-2xl p-4">
-          <div class="text-xs text-sky-400">বর্তমানে পড়ছি</div>
+          <div class="text-xs text-sky-400">চলমান অধ্যায়</div>
           <div id="stat-reading" class="text-2xl font-extrabold text-sky-400 mt-1">০</div>
           <div class="text-[11px] text-sky-500">টি অধ্যায়</div>
         </div>
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
+          <div class="text-xs text-slate-400">অসম্পূর্ণ অধ্যায়</div>
+          <div id="stat-incomplete" class="text-2xl font-extrabold text-slate-200 mt-1">০</div>
+          <div class="text-[11px] text-slate-500">এখনো শুরু হয়নি</div>
+        </div>
       </div>
 
-      <!-- Today Focus -->
+      <!-- Quick status filters -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <button onclick="setStatusFilter('reading')" class="group text-left p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-sky-500/40 transition-all">
-          <div class="flex items-center justify-between"><span class="text-[11px] font-bold text-sky-400">CURRENT FOCUS</span><i data-lucide="book-open" class="w-4 h-4 text-sky-400"></i></div>
-          <div class="text-sm font-bold text-white mt-2">যেগুলো এখন পড়ছো</div>
-          <div class="text-[11px] text-slate-500 mt-1">এক ক্লিকে Reading filter</div>
+          <div class="text-[11px] font-bold text-sky-400">চলমান</div>
+          <div class="text-sm font-bold text-white mt-2">যে অধ্যায়গুলো পড়ছো</div>
+          <div class="text-[11px] text-slate-500 mt-1">চলমান অধ্যায় দেখুন</div>
         </button>
-        <button onclick="setStatusFilter('revision')" class="group text-left p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-amber-500/40 transition-all">
-          <div class="flex items-center justify-between"><span class="text-[11px] font-bold text-amber-400">REVISION</span><i data-lucide="rotate-cw" class="w-4 h-4 text-amber-400"></i></div>
-          <div class="text-sm font-bold text-white mt-2">রিভিশন লিস্ট</div>
-          <div class="text-[11px] text-slate-500 mt-1">যে অধ্যায়গুলো আবার দেখতে হবে</div>
+        <button onclick="setStatusFilter('mastered')" class="group text-left p-4 rounded-2xl bg-slate-900/80 border border-emerald-500/20 hover:border-emerald-500/40 transition-all">
+          <div class="text-[11px] font-bold text-emerald-400">সম্পন্ন</div>
+          <div class="text-sm font-bold text-white mt-2">শেষ করা অধ্যায়</div>
+          <div class="text-[11px] text-slate-500 mt-1">সম্পন্ন তালিকা দেখুন</div>
         </button>
-        <button onclick="setStatusFilter('not_started')" class="group text-left p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-rose-500/40 transition-all">
-          <div class="flex items-center justify-between"><span class="text-[11px] font-bold text-rose-400">NEXT UP</span><i data-lucide="arrow-right" class="w-4 h-4 text-rose-400"></i></div>
-          <div class="text-sm font-bold text-white mt-2">শুরু করা হয়নি</div>
+        <button onclick="setStatusFilter('not_started')" class="group text-left p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-indigo-500/40 transition-all">
+          <div class="text-[11px] font-bold text-indigo-400">পরবর্তী লক্ষ্য</div>
+          <div class="text-sm font-bold text-white mt-2">অসম্পূর্ণ অধ্যায়</div>
           <div class="text-[11px] text-slate-500 mt-1">পরের অধ্যায় বেছে নাও</div>
         </button>
       </div>
 
       <!-- Subject Badges Carousel -->
       <div class="space-y-2">
-        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">বিষয় নির্বাচন করুন:</div>
+        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">বিষয়ভিত্তিক অগ্রগতি ও ফিল্টার</div>
         <div id="subject-filters" class="flex gap-2 overflow-x-auto pb-1 custom-scroll">
           <!-- Populated by JS -->
         </div>
       </div>
 
       <!-- Search & Status Filter -->
-      <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-slate-900/60 border border-slate-800 p-3 rounded-2xl">
-        <div id="status-filter-pills" class="flex gap-1.5 overflow-x-auto text-xs">
-          <button onclick="setStatusFilter('all')" class="status-btn px-3 py-1.5 rounded-xl border bg-slate-800 border-slate-700 text-white font-bold" data-status="all">সব</button>
-          <button onclick="setStatusFilter('mastered')" class="status-btn px-3 py-1.5 rounded-xl border border-transparent text-slate-400" data-status="mastered">সম্পূর্ণ প্রস্তুত ★</button>
-          <button onclick="setStatusFilter('revision')" class="status-btn px-3 py-1.5 rounded-xl border border-transparent text-slate-400" data-status="revision">রিভিশন বাকি</button>
-          <button onclick="setStatusFilter('reading')" class="status-btn px-3 py-1.5 rounded-xl border border-transparent text-slate-400" data-status="reading">পড়ছি</button>
-          <button onclick="setStatusFilter('not_started')" class="status-btn px-3 py-1.5 rounded-xl border border-transparent text-slate-400" data-status="not_started">শুরু করিনি</button>
-          <button onclick="setStatusFilter('bookmarked')" class="status-btn px-3 py-1.5 rounded-xl border border-transparent text-slate-400" data-status="bookmarked">বুকমার্ক</button>
+      <div class="filter-panel p-4 sm:p-5 rounded-2xl space-y-4">
+        <div class="flex flex-col lg:flex-row gap-3 lg:items-end">
+          <label class="block flex-1">
+            <span class="block text-xs font-bold text-slate-300 mb-2">অধ্যায় খুঁজুন</span>
+            <div class="relative">
+              <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+              <input type="search" id="search-input" oninput="handleSearch(this.value)" placeholder="অধ্যায়ের নাম বা বিষয় লিখুন..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+            </div>
+          </label>
+          <label class="block lg:w-56">
+            <span class="block text-xs font-bold text-slate-300 mb-2">স্ট্যাটাস অনুযায়ী</span>
+            <select id="status-select" onchange="setStatusFilter(this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-3 text-sm text-slate-200">
+              <option value="all">সব স্ট্যাটাস</option>
+              <option value="not_started">অসম্পূর্ণ</option>
+              <option value="reading">চলমান</option>
+              <option value="mastered">সম্পন্ন</option>
+              <option value="bookmarked">বুকমার্ক করা</option>
+            </select>
+          </label>
         </div>
-        <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="অধ্যায় বা সূত্র খুঁজুন..." class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <p class="text-xs text-slate-400">বিষয়, স্ট্যাটাস ও সার্চ একসঙ্গে ব্যবহার করতে পারো।</p>
+          <button type="button" onclick="clearChapterFilters()" class="px-3 py-2 rounded-lg border border-slate-700 text-xs font-bold text-slate-300 hover:bg-slate-800">ফিল্টার মুছুন</button>
+        </div>
       </div>
 
       <!-- Chapter Cards Grid -->
       <div id="chapters-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <!-- Rendered by JS -->
-      </div>
-    </section>
-
-    <!-- 2. FORMULAS TAB -->
-    <section id="view-formulas" class="hidden max-w-4xl mx-auto space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-xl font-bold text-white flex items-center gap-2 mb-2">
-          <i data-lucide="calculator" class="text-amber-400"></i> এসএসসি সূত্র ভাণ্ডার (Formula Bank)
-        </h2>
-        <p class="text-xs text-slate-400 mb-6">পদার্থবিজ্ঞান, রসায়ন, সাধারণ গণিত ও উচ্চতর গণিতের প্রধান সূত্রসমূহ।</p>
-        <div id="formulas-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
       </div>
     </section>
 
@@ -336,7 +433,7 @@
       <div class="rounded-3xl bg-gradient-to-br from-violet-700 via-indigo-700 to-sky-600 p-6 sm:p-8 text-white shadow-xl">
         <div class="text-xs font-bold text-white/75 mb-2">SMART PREPARATION PLANNER</div>
         <h2 class="text-2xl sm:text-3xl font-extrabold">পরীক্ষার প্রস্তুতি, এবার পরিকল্পিতভাবে</h2>
-        <p class="text-sm text-white/80 mt-2">পরীক্ষার তারিখ, দৈনিক পড়ার লক্ষ্য, রিভিশন ও নিজের অগ্রগতি এক জায়গায় রাখো।</p>
+        <p class="text-sm text-white/80 mt-2">পরীক্ষার তারিখ, দৈনিক পড়ার লক্ষ্য ও নিজের অগ্রগতি এক জায়গায় রাখো।</p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
           <label class="block rounded-2xl bg-white/10 border border-white/20 p-4">
             <span class="block text-xs text-white/80 mb-2">SSC পরীক্ষার তারিখ (নিজে সেট করো)</span>
@@ -351,12 +448,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5">
-          <div class="flex items-center justify-between gap-3"><h3 class="font-bold text-white">রিভিশন রিমাইন্ডার</h3><span id="revision-due-count" class="text-xs rounded-full px-2 py-1 bg-amber-500/10 text-amber-400">০টি বাকি</span></div>
-          <p class="text-xs text-slate-400 mt-1 mb-4">সম্পন্ন অধ্যায়ের জন্য স্বয়ংক্রিয়ভাবে পরের দিনের রিভিশন তারিখ রাখা হয়।</p>
-          <div id="revision-due-list" class="space-y-2"><p class="text-xs text-slate-500">এখনো কোনো রিভিশন নেই।</p></div>
-        </div>
+      <div class="grid grid-cols-1 gap-4">
         <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5">
           <div class="flex items-center justify-between gap-3"><h3 class="font-bold text-white">গত ৭ দিনের ফোকাস</h3><span class="text-xs text-slate-500">Pomodoro সেশন</span></div>
           <div id="weekly-analytics" class="mt-5 space-y-3"></div>
@@ -394,11 +486,10 @@
         <!-- Status Changer -->
         <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between flex-wrap gap-2">
           <span class="text-slate-400">প্রিপারেশন স্ট্যাটাস:</span>
-          <div class="flex gap-1.5" id="modal-status-buttons">
-            <button onclick="setModalChapterStatus('not_started')" class="px-2.5 py-1 rounded-lg border border-slate-800 text-slate-400 text-[11px]" data-mstatus="not_started">শুরু করিনি</button>
-            <button onclick="setModalChapterStatus('reading')" class="px-2.5 py-1 rounded-lg border border-slate-800 text-sky-400 text-[11px]" data-mstatus="reading">পড়ছি</button>
-            <button onclick="setModalChapterStatus('revision')" class="px-2.5 py-1 rounded-lg border border-slate-800 text-amber-400 text-[11px]" data-mstatus="revision">রিভিশন বাকি</button>
-            <button onclick="setModalChapterStatus('mastered')" class="px-2.5 py-1 rounded-lg border border-slate-800 text-emerald-400 text-[11px]" data-mstatus="mastered">সম্পূর্ণ প্রস্তুত ★</button>
+          <div class="flex flex-wrap gap-1.5" id="modal-status-buttons">
+            <button onclick="setModalChapterStatus('not_started')" class="px-3 py-1.5 rounded-lg border border-slate-800 text-slate-400 text-[11px]" data-mstatus="not_started">অসম্পূর্ণ</button>
+            <button onclick="setModalChapterStatus('reading')" class="px-3 py-1.5 rounded-lg border border-slate-800 text-sky-400 text-[11px]" data-mstatus="reading">চলমান</button>
+            <button onclick="setModalChapterStatus('mastered')" class="px-3 py-1.5 rounded-lg border border-slate-800 text-emerald-400 text-[11px]" data-mstatus="mastered">সম্পন্ন</button>
           </div>
         </div>
 
@@ -408,11 +499,6 @@
           <p id="modal-summary" class="leading-relaxed text-slate-400"></p>
         </div>
 
-        <!-- Key Formulas -->
-        <div class="space-y-2">
-          <div class="font-bold text-slate-200">গুরুত্বপূর্ণ সূত্র ও পয়েন্ট:</div>
-          <div id="modal-formulas" class="space-y-1"></div>
-        </div>
 
         <!-- Notes -->
         <div class="space-y-1">
@@ -438,20 +524,20 @@
         name: 'পদার্থবিজ্ঞান',
         color: 'text-cyan-400',
         chapters: [
-          { id: 'physics-1', name: 'ভৌত রাশি এবং পরিমাপ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'physics-2', name: 'গতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'physics-3', name: 'বল', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'physics-4', name: 'কাজ, শক্তি ও ক্ষমতা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'physics-5', name: 'পদার্থের অবস্থা ও চাপ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'physics-6', name: 'বস্তুর ওপর তাপের প্রভাব', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'physics-7', name: 'তরঙ্গ ও শব্দ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'physics-8', name: 'আলোর প্রতিফলন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'physics-9', name: 'আলোর প্রতিসরণ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'physics-10', name: 'স্থির বিদ্যুৎ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'physics-11', name: 'চল বিদ্যুৎ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'physics-12', name: 'বিদ্যুতের চৌম্বক ক্রিয়া', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'physics-13', name: 'আধুনিক পদার্থবিজ্ঞান ও ইলেকট্রনিক্স', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'physics-14', name: 'জীবন বাঁচাতে পদার্থবিজ্ঞান', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
+          { id: 'physics-1', name: 'ভৌত রাশি এবং পরিমাপ', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-2', name: 'গতি', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-3', name: 'বল', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-4', name: 'কাজ, শক্তি ও ক্ষমতা', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-5', name: 'পদার্থের অবস্থা ও চাপ', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-6', name: 'বস্তুর ওপর তাপের প্রভাব', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-7', name: 'তরঙ্গ ও শব্দ', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-8', name: 'আলোর প্রতিফলন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-9', name: 'আলোর প্রতিসরণ', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-10', name: 'স্থির বিদ্যুৎ', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-11', name: 'চল বিদ্যুৎ', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-12', name: 'বিদ্যুতের চৌম্বক ক্রিয়া', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-13', name: 'আধুনিক পদার্থবিজ্ঞান ও ইলেকট্রনিক্স', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'physics-14', name: 'জীবন বাঁচাতে পদার্থবিজ্ঞান', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
         ]
       },
       {
@@ -459,18 +545,18 @@
         name: 'রসায়ন',
         color: 'text-emerald-400',
         chapters: [
-          { id: 'chemistry-1', name: 'রসায়নের ধারণা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'chemistry-2', name: 'পদার্থের অবস্থা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'chemistry-3', name: 'পদার্থের গঠন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'chemistry-4', name: 'পর্যায় সারণি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'chemistry-5', name: 'রাসায়নিক বন্ধন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'chemistry-6', name: 'মোলের ধারণা ও রাসায়নিক গণনা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'chemistry-7', name: 'রাসায়নিক বিক্রিয়া', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'chemistry-8', name: 'রসায়ন ও শক্তি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'chemistry-9', name: 'এসিড-ক্ষার সমতা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'chemistry-10', name: 'খনিজ সম্পদ: ধাতু-অধাতু', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'chemistry-11', name: 'খনিজ সম্পদ: জীবাশ্ম', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'chemistry-12', name: 'আমাদের জীবনে রসায়ন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
+          { id: 'chemistry-1', name: 'রসায়নের ধারণা', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-2', name: 'পদার্থের অবস্থা', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-3', name: 'পদার্থের গঠন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-4', name: 'পর্যায় সারণি', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-5', name: 'রাসায়নিক বন্ধন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-6', name: 'মোলের ধারণা ও রাসায়নিক গণনা', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-7', name: 'রাসায়নিক বিক্রিয়া', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-8', name: 'রসায়ন ও শক্তি', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-9', name: 'এসিড-ক্ষার সমতা', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-10', name: 'খনিজ সম্পদ: ধাতু-অধাতু', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-11', name: 'খনিজ সম্পদ: জীবাশ্ম', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'chemistry-12', name: 'আমাদের জীবনে রসায়ন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
         ]
       },
       {
@@ -478,23 +564,23 @@
         name: 'সাধারণ গণিত',
         color: 'text-amber-400',
         chapters: [
-          { id: 'general_math-1', name: 'বাস্তব সংখ্যা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'general_math-2', name: 'সেট ও ফাংশন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'general_math-3', name: 'বীজগাণিতিক রাশি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'general_math-4', name: 'সূচক ও লগারিদম', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'general_math-5', name: 'একচলকবিশিষ্ট সমীকরণ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'general_math-6', name: 'রেখা, কোণ ও ত্রিভুজ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'general_math-7', name: 'ব্যবহারিক জ্যামিতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'general_math-8', name: 'বৃত্ত', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'general_math-9', name: 'ত্রিকোণমিতিক অনুপাত', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'general_math-10', name: 'দূরত্ব ও উচ্চতা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'general_math-11', name: 'বীজগাণিতিক অনুপাত ও সমানুপাত', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'general_math-12', name: 'দুই চলকবিশিষ্ট সরল সহসমীকরণ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'general_math-13', name: 'সসীম ধারা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'general_math-14', name: 'অনুপাত, সদৃশতা ও প্রতিসমতা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'general_math-15', name: 'ক্ষেত্রফল সম্পর্কিত উপপাদ্য ও সম্পাদ্য', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'general_math-16', name: 'পরিমিতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'general_math-17', name: 'পরিসংখ্যান', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
+          { id: 'general_math-1', name: 'বাস্তব সংখ্যা', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-2', name: 'সেট ও ফাংশন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-3', name: 'বীজগাণিতিক রাশি', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-4', name: 'সূচক ও লগারিদম', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-5', name: 'একচলকবিশিষ্ট সমীকরণ', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-6', name: 'রেখা, কোণ ও ত্রিভুজ', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-7', name: 'ব্যবহারিক জ্যামিতি', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-8', name: 'বৃত্ত', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-9', name: 'ত্রিকোণমিতিক অনুপাত', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-10', name: 'দূরত্ব ও উচ্চতা', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-11', name: 'বীজগাণিতিক অনুপাত ও সমানুপাত', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-12', name: 'দুই চলকবিশিষ্ট সরল সহসমীকরণ', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-13', name: 'সসীম ধারা', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-14', name: 'অনুপাত, সদৃশতা ও প্রতিসমতা', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-15', name: 'ক্ষেত্রফল সম্পর্কিত উপপাদ্য ও সম্পাদ্য', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-16', name: 'পরিমিতি', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'general_math-17', name: 'পরিসংখ্যান', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
         ]
       },
       {
@@ -502,20 +588,20 @@
         name: 'উচ্চতর গণিত',
         color: 'text-purple-400',
         chapters: [
-          { id: 'higher_math-1', name: 'সেট ও ফাংশন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'higher_math-2', name: 'বীজগাণিতিক রাশি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'higher_math-3', name: 'জ্যামিতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'higher_math-4', name: 'জ্যামিতিক অঙ্কন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'higher_math-5', name: 'সমীকরণ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'higher_math-6', name: 'অসমতা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'higher_math-7', name: 'অসীম ধারা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'higher_math-8', name: 'ত্রিকোণমিতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'higher_math-9', name: 'সূচকীয় ও লগারিদমীয় ফাংশন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'higher_math-10', name: 'দ্বিপদী বিস্তৃতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'higher_math-11', name: 'স্থানাঙ্ক জ্যামিতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'higher_math-12', name: 'সমতলীয় ভেক্টর', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'higher_math-13', name: 'ঘন জ্যামিতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'higher_math-14', name: 'সম্ভাবনা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
+          { id: 'higher_math-1', name: 'সেট ও ফাংশন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-2', name: 'বীজগাণিতিক রাশি', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-3', name: 'জ্যামিতি', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-4', name: 'জ্যামিতিক অঙ্কন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-5', name: 'সমীকরণ', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-6', name: 'অসমতা', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-7', name: 'অসীম ধারা', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-8', name: 'ত্রিকোণমিতি', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-9', name: 'সূচকীয় ও লগারিদমীয় ফাংশন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-10', name: 'দ্বিপদী বিস্তৃতি', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-11', name: 'স্থানাঙ্ক জ্যামিতি', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-12', name: 'সমতলীয় ভেক্টর', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-13', name: 'ঘন জ্যামিতি', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'higher_math-14', name: 'সম্ভাবনা', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
         ]
       },
       {
@@ -523,20 +609,20 @@
         name: 'জীববিজ্ঞান',
         color: 'text-green-400',
         chapters: [
-          { id: 'biology-1', name: 'জীবন পাঠ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'biology-2', name: 'জীবকোষ ও টিস্যু', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'biology-3', name: 'কোষ বিভাজন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'biology-4', name: 'জীবনীশক্তি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'biology-5', name: 'খাদ্য, পুষ্টি এবং পরিপাক', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'biology-6', name: 'জীবে পরিবহন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'biology-7', name: 'গ্যাসীয় বিনিময়', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'biology-8', name: 'রেচন প্রক্রিয়া', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'biology-9', name: 'দৃঢ়তা প্রদান ও চলন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'biology-10', name: 'সমন্বয়', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'biology-11', name: 'জীবের প্রজনন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'biology-12', name: 'জীবের বংশগতি ও বিবর্তন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'biology-13', name: 'জীবের পরিবেশ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'biology-14', name: 'জীবপ্রযুক্তি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
+          { id: 'biology-1', name: 'জীবন পাঠ', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-2', name: 'জীবকোষ ও টিস্যু', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-3', name: 'কোষ বিভাজন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-4', name: 'জীবনীশক্তি', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-5', name: 'খাদ্য, পুষ্টি এবং পরিপাক', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-6', name: 'জীবে পরিবহন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-7', name: 'গ্যাসীয় বিনিময়', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-8', name: 'রেচন প্রক্রিয়া', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-9', name: 'দৃঢ়তা প্রদান ও চলন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-10', name: 'সমন্বয়', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-11', name: 'জীবের প্রজনন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-12', name: 'জীবের বংশগতি ও বিবর্তন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-13', name: 'জীবের পরিবেশ', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'biology-14', name: 'জীবপ্রযুক্তি', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
         ]
       },
       {
@@ -544,22 +630,22 @@
         name: 'বাংলাদেশ ও বিশ্বপরিচয়',
         color: 'text-rose-400',
         chapters: [
-          { id: 'bgs-1', name: 'পূর্ব বাংলার আন্দোলন ও জাতীয়তাবাদের উত্থান (১৯৪৭-১৯৭০)', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'bgs-2', name: 'স্বাধীন বাংলাদেশ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'bgs-3', name: 'সৌরজগৎ ও ভূমণ্ডল', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'bgs-4', name: 'বাংলাদেশের ভূপ্রকৃতি ও জলবায়ু', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'bgs-5', name: 'বাংলাদেশের নদ-নদী ও প্রাকৃতিক সম্পদ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'bgs-6', name: 'রাষ্ট্র, নাগরিকতা ও আইন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'bgs-7', name: 'বাংলাদেশ সরকারের অঙ্গসমূহ ও প্রশাসন ব্যবস্থা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'bgs-8', name: 'বাংলাদেশের গণতন্ত্র ও নির্বাচন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'bgs-9', name: 'জাতিসংঘ ও বাংলাদেশ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'bgs-10', name: 'টেকসই উন্নয়ন অভীষ্ট (SDG)', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'bgs-11', name: 'জাতীয় সম্পদ ও অর্থনৈতিক ব্যবস্থা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'bgs-12', name: 'অর্থনৈতিক নির্দেশকসমূহ ও বাংলাদেশের অর্থনীতির প্রকৃতি', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'bgs-13', name: 'বাংলাদেশ সরকারের অর্থ ও ব্যাংক ব্যবস্থা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'bgs-14', name: 'বাংলাদেশের সামাজিক পরিবর্তন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'bgs-15', name: 'বাংলাদেশের সামাজিক সমস্যা ও এর প্রতিকার', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'bgs-16', name: 'বাংলাদেশের সাংস্কৃতিক বৈচিত্র্য', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
+          { id: 'bgs-1', name: 'পূর্ব বাংলার আন্দোলন ও জাতীয়তাবাদের উত্থান (১৯৪৭-১৯৭০)', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-2', name: 'স্বাধীন বাংলাদেশ', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-3', name: 'সৌরজগৎ ও ভূমণ্ডল', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-4', name: 'বাংলাদেশের ভূপ্রকৃতি ও জলবায়ু', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-5', name: 'বাংলাদেশের নদ-নদী ও প্রাকৃতিক সম্পদ', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-6', name: 'রাষ্ট্র, নাগরিকতা ও আইন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-7', name: 'বাংলাদেশ সরকারের অঙ্গসমূহ ও প্রশাসন ব্যবস্থা', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-8', name: 'বাংলাদেশের গণতন্ত্র ও নির্বাচন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-9', name: 'জাতিসংঘ ও বাংলাদেশ', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-10', name: 'টেকসই উন্নয়ন অভীষ্ট (SDG)', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-11', name: 'জাতীয় সম্পদ ও অর্থনৈতিক ব্যবস্থা', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-12', name: 'অর্থনৈতিক নির্দেশকসমূহ ও বাংলাদেশের অর্থনীতির প্রকৃতি', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-13', name: 'বাংলাদেশ সরকারের অর্থ ও ব্যাংক ব্যবস্থা', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-14', name: 'বাংলাদেশের সামাজিক পরিবর্তন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-15', name: 'বাংলাদেশের সামাজিক সমস্যা ও এর প্রতিকার', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'bgs-16', name: 'বাংলাদেশের সাংস্কৃতিক বৈচিত্র্য', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
         ]
       },
       {
@@ -567,12 +653,12 @@
         name: 'তথ্য ও যোগাযোগ প্রযুক্তি',
         color: 'text-sky-400',
         chapters: [
-          { id: 'ict-1', name: 'তথ্য ও যোগাযোগ প্রযুক্তি এবং আমাদের বাংলাদেশ', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'ict-2', name: 'কম্পিউটার ও কম্পিউটার ব্যবহারকারীর নিরাপত্তা', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'ict-3', name: 'আমার শিক্ষায় ইন্টারনেট', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'ict-4', name: 'আমার লেখালেখি ও হিসাব', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'ict-5', name: 'মাল্টিমিডিয়া ও গ্রাফিক্স', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'ict-6', name: 'ডাটাবেজ এর ব্যবহার', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
+          { id: 'ict-1', name: 'তথ্য ও যোগাযোগ প্রযুক্তি এবং আমাদের বাংলাদেশ', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'ict-2', name: 'কম্পিউটার ও কম্পিউটার ব্যবহারকারীর নিরাপত্তা', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'ict-3', name: 'আমার শিক্ষায় ইন্টারনেট', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'ict-4', name: 'আমার লেখালেখি ও হিসাব', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'ict-5', name: 'মাল্টিমিডিয়া ও গ্রাফিক্স', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'ict-6', name: 'ডাটাবেজ এর ব্যবহার', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
         ]
       },
       {
@@ -580,26 +666,13 @@
         name: 'ইসলাম ও নৈতিক শিক্ষা',
         color: 'text-teal-400',
         chapters: [
-          { id: 'islamic_studies-1', name: 'আকাইদ ও নৈতিক জীবন', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'islamic_studies-2', name: 'শরীয়তের উৎস', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'islamic_studies-3', name: 'ইবাদত', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'islamic_studies-4', name: 'আখলাক', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
-          { id: 'islamic_studies-5', name: 'আদর্শ জীবনচরিত', summary: 'এই অধ্যায়ের পড়া, রিভিশন ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
+          { id: 'islamic_studies-1', name: 'আকাইদ ও নৈতিক জীবন', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'islamic_studies-2', name: 'শরীয়তের উৎস', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'islamic_studies-3', name: 'ইবাদত', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'islamic_studies-4', name: 'আখলাক', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] },
+          { id: 'islamic_studies-5', name: 'আদর্শ জীবনচরিত', summary: 'এই অধ্যায়ের পড়া ও ব্যক্তিগত নোট এখানে ট্র্যাক করুন।', formulas: [] }
         ]
       }
-    ];
-
-    // 2. FORMULAS DATASET
-    const FORMULAS = [
-      { subject: 'পদার্থবিজ্ঞান', title: 'গতির মৌলিক সমীকরণ', eq: 'v = u + at  |  s = ut + ½at²  |  v² = u² + 2as' },
-      { subject: 'পদার্থবিজ্ঞান', title: 'নিউটনের ২য় সূত্র ও কাজ', eq: 'F = ma  |  W = Fs  |  Ek = ½mv²  |  Ep = mgh' },
-      { subject: 'পদার্থবিজ্ঞান', title: 'ওহমের সূত্র ও বিদ্যুৎ বিল', eq: 'V = IR  |  Unit(kWh) = (P × t) / 1000' },
-      { subject: 'রসায়ন', title: 'মোলের সমন্বিত সমীকরণ', eq: 'n = W/M = V(STP)/22.4 = N/(6.023 × 10²³)' },
-      { subject: 'রসায়ন', title: 'মোলারিটি ও এনথালপি', eq: 'S = (1000 × W) / (M × V_mL)  |  ΔH = B₁ - B₂' },
-      { subject: 'সাধারণ গণিত', title: 'সমান্তর ধারার সমষ্টি', eq: 'Sn = (n/2) [2a + (n - 1)d]  |  n-তম পদ = a + (n-1)d' },
-      { subject: 'সাধারণ গণিত', title: 'পরিমিতি ও সমবাহু ত্রিভুজ', eq: 'ক্ষেত্রফল = (√3/4)a²  |  বৃত্ত = πr²  |  পরিধি = 2πr' },
-      { subject: 'উচ্চতর গণিত', title: 'দ্বিঘাত সমীকরণ ও নিশ্চায়ক', eq: 'x = (-b ± √(b² - 4ac)) / 2a  |  D = b² - 4ac' },
-      { subject: 'উচ্চতর গণিত', title: 'অনন্ত গুণোত্তর ধারার সমষ্টি', eq: 'S_∞ = a / (1 - r)  [শর্ত: |r| < 1]' }
     ];
 
     // STATE
@@ -609,6 +682,16 @@
       catch (error) { console.warn('Stored data could not be read:', key, error); return fallback; }
     }
     let progress = readStoredJSON('ssc_progress_standalone_v2', {});
+    // Migrate saved legacy statuses without touching subject/chapter names or notes.
+    if (progress && typeof progress === 'object') {
+      Object.values(progress).forEach(p => {
+        if (!p || typeof p !== 'object') return;
+        if (p.status === 'mastered') p.status = 'mastered';
+        else if (p.status === 'reading') p.status = 'reading';
+        else p.status = 'not_started';
+        delete p.reviewDue;
+      });
+    }
     if (!progress || typeof progress !== 'object' || Array.isArray(progress)) progress = {};
     const TOTAL_CHAPTERS = SUBJECTS.reduce((sum, subject) => sum + subject.chapters.length, 0);
     let studySecondsToday = 0;
@@ -671,11 +754,10 @@
       applyTheme(localStorage.getItem('ssc_theme') || 'dark');
       renderSubjectFilters();
       const chapterTab = document.getElementById('tab-btn-chapters');
-      if (chapterTab) chapterTab.innerHTML = `<i data-lucide="layers" class="w-4 h-4"></i> অধ্যায় ট্র্যাকার (98)`;
+      if (chapterTab) chapterTab.innerHTML = `<i data-lucide="layers" class="w-4 h-4"></i> অধ্যায় ট্র্যাকার (${TOTAL_CHAPTERS.toLocaleString('bn-BD')})`;
       const totalStat = document.querySelector('#view-chapters .grid.grid-cols-2.sm\\:grid-cols-4 > div:first-child .text-2xl');
       if (totalStat) totalStat.textContent = `${TOTAL_CHAPTERS.toLocaleString('bn-BD')} টি`;
       renderChapters();
-      renderFormulas();
       renderGoals();
       loadPlannerSettings();
       renderPlanner();
@@ -690,16 +772,20 @@
 
       // Escape closes overlays; clicks inside the modal do not close it accidentally.
       window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') { closeChapterModal(); closeResetModal(); }
+        if (e.key === 'Escape') { closeChapterModal(); closeResetModal(); closeAppConfirmation(); }
       });
       document.getElementById('reset-modal').addEventListener('click', e => {
         if (e.target.id === 'reset-modal') closeResetModal();
+      });
+      const confirmModal = document.getElementById('confirm-modal');
+      if (confirmModal) confirmModal.addEventListener('click', e => {
+        if (e.target.id === 'confirm-modal') closeAppConfirmation();
       });
     }
 
     // Switch Tabs
     function switchTab(tabId) {
-      ['chapters', 'formulas', 'pomodoro', 'goals', 'planner'].forEach(t => {
+      ['chapters', 'pomodoro', 'goals', 'planner'].forEach(t => {
         document.getElementById(`view-${t}`).classList.add('hidden');
         const btn = document.getElementById(`tab-btn-${t}`);
         btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
@@ -712,18 +798,22 @@
       lucide.createIcons();
     }
 
-    // Render Subject Carousel
+    // Render subject filters with live completed/total progress for every subject.
     function renderSubjectFilters() {
       const container = document.getElementById('subject-filters');
-      container.innerHTML = `
-        <button onclick="setSubjectFilter('all')" class="px-3.5 py-1.5 rounded-xl border text-xs font-semibold whitespace-nowrap transition-all ${currentSubjectFilter === 'all' ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-slate-900 border-slate-800 text-slate-400'}">
-          সব বিষয় (${TOTAL_CHAPTERS})
-        </button>
-      ` + SUBJECTS.map(s => `
-        <button onclick="setSubjectFilter('${s.id}')" class="px-3.5 py-1.5 rounded-xl border text-xs font-semibold whitespace-nowrap transition-all ${currentSubjectFilter === s.id ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-slate-900 border-slate-800 text-slate-400'}">
-          ${s.name} (${s.chapters.length})
-        </button>
-      `).join('');
+      const allDone = SUBJECTS.reduce((n, s) => n + s.chapters.filter(c => progress[c.id]?.status === 'mastered').length, 0);
+      const subjectButton = (id, name, total, done, pct, selected) => `
+        <button type="button" onclick="setSubjectFilter('${id}')" class="px-3 py-2.5 rounded-xl border text-xs transition-all ${selected ? 'bg-indigo-600 text-white border-indigo-400 shadow-lg shadow-indigo-900/20' : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-indigo-500/50'}">
+          <span class="block font-bold">${name}</span>
+          <span class="block mt-1 text-[10px] ${selected ? 'text-indigo-100' : 'text-slate-500'}">${done.toLocaleString('bn-BD')} / ${total.toLocaleString('bn-BD')} সম্পন্ন · ${pct}%</span>
+          <span class="chapter-progress-track block mt-2"><span class="chapter-progress-fill block ${selected ? 'bg-white' : 'bg-indigo-500'}" style="width:${pct}%"></span></span>
+        </button>`;
+      container.innerHTML = subjectButton('all', 'সব বিষয়', TOTAL_CHAPTERS, allDone, TOTAL_CHAPTERS ? Math.round(allDone / TOTAL_CHAPTERS * 100) : 0, currentSubjectFilter === 'all') +
+        SUBJECTS.map(s => {
+          const done = s.chapters.filter(c => progress[c.id]?.status === 'mastered').length;
+          const pct = s.chapters.length ? Math.round(done / s.chapters.length * 100) : 0;
+          return subjectButton(s.id, s.name, s.chapters.length, done, pct, currentSubjectFilter === s.id);
+        }).join('');
     }
 
     function setSubjectFilter(id) {
@@ -733,85 +823,97 @@
     }
 
     function setStatusFilter(status) {
-      currentStatusFilter = status;
-      document.querySelectorAll('.status-btn').forEach(b => {
-        if (b.dataset.status === status) {
-          b.className = 'status-btn px-3 py-1.5 rounded-xl border bg-slate-800 border-slate-700 text-white font-bold';
-        } else {
-          b.className = 'status-btn px-3 py-1.5 rounded-xl border border-transparent text-slate-400';
-        }
-      });
+      currentStatusFilter = status || 'all';
+      const select = document.getElementById('status-select');
+      if (select) select.value = currentStatusFilter;
       renderChapters();
     }
 
     function handleSearch(q) {
-      currentSearch = q.toLowerCase();
+      currentSearch = String(q || '').trim().toLocaleLowerCase('bn-BD');
       renderChapters();
     }
 
-    // Render Chapter Cards
+    function clearChapterFilters() {
+      currentSubjectFilter = 'all';
+      currentStatusFilter = 'all';
+      currentSearch = '';
+      const search = document.getElementById('search-input');
+      if (search) search.value = '';
+      const select = document.getElementById('status-select');
+      if (select) select.value = 'all';
+      renderSubjectFilters();
+      renderChapters();
+    }
+
+    // The chapter status cycles in the exact requested order.
+    function cycleChapterStatus(chapterId) {
+      const current = progress[chapterId]?.status || 'not_started';
+      const next = current === 'not_started' ? 'reading' : current === 'reading' ? 'mastered' : 'not_started';
+      if (!progress[chapterId]) progress[chapterId] = { notes: '', bookmarked: false };
+      progress[chapterId].status = next;
+      delete progress[chapterId].reviewDue;
+      saveProgress();
+      renderSubjectFilters();
+      renderChapters();
+      updateStats();
+      if (activeModalChapter && activeModalChapter.id === chapterId) updateModalStatusUI(next);
+      showToast(next === 'not_started' ? 'স্ট্যাটাস: অসম্পূর্ণ' : next === 'reading' ? 'স্ট্যাটাস: চলমান' : 'স্ট্যাটাস: সম্পন্ন');
+    }
+
+    // Render Chapter Cards.
     function renderChapters() {
       const grid = document.getElementById('chapters-grid');
-      let chaptersList = [];
-
+      if (!grid) return;
+      const chaptersList = [];
       SUBJECTS.forEach(sub => {
         if (currentSubjectFilter === 'all' || currentSubjectFilter === sub.id) {
           sub.chapters.forEach((c, idx) => {
             const p = progress[c.id] || { status: 'not_started', notes: '', bookmarked: false };
-            
-            const matchSearch = c.name.toLowerCase().includes(currentSearch) || sub.name.toLowerCase().includes(currentSearch);
-            let matchStatus = true;
-            if (currentStatusFilter === 'mastered') matchStatus = p.status === 'mastered';
-            else if (currentStatusFilter === 'reading') matchStatus = p.status === 'reading';
-            else if (currentStatusFilter === 'revision') matchStatus = p.status === 'revision';
-            else if (currentStatusFilter === 'not_started') matchStatus = !p.status || p.status === 'not_started';
-            else if (currentStatusFilter === 'bookmarked') matchStatus = !!p.bookmarked;
-
-            if (matchSearch && matchStatus) {
-              chaptersList.push({ ...c, subjectName: sub.name, subjectId: sub.id, chapterNum: idx + 1, prog: p });
-            }
+            const searchText = `${c.name} ${sub.name} ${idx + 1}`.toLocaleLowerCase('bn-BD');
+            const matchSearch = !currentSearch || searchText.includes(currentSearch);
+            const status = ['not_started', 'reading', 'mastered'].includes(p.status) ? p.status : 'not_started';
+            const matchStatus = currentStatusFilter === 'all' ||
+              (currentStatusFilter === 'not_started' && status === 'not_started') ||
+              (currentStatusFilter === 'reading' && status === 'reading') ||
+              (currentStatusFilter === 'mastered' && status === 'mastered') ||
+              (currentStatusFilter === 'bookmarked' && !!p.bookmarked);
+            if (matchSearch && matchStatus) chaptersList.push({ ...c, subjectName: sub.name, subjectId: sub.id, chapterNum: idx + 1, prog: { ...p, status } });
           });
         }
       });
 
-      if (chaptersList.length === 0) {
-        grid.innerHTML = '<div class="col-span-full text-center py-12 text-slate-500 text-xs">কোনো অধ্যায় খুঁজে পাওয়া যায়নি।</div>';
+      if (!chaptersList.length) {
+        grid.innerHTML = '<div class="col-span-full text-center py-12 px-4 rounded-2xl border border-dashed border-slate-700 text-slate-500"><div class="text-2xl mb-2">⌕</div><p class="font-bold text-sm">কোনো অধ্যায় পাওয়া যায়নি</p><p class="text-xs mt-1">সার্চের শব্দ বা ফিল্টার পরিবর্তন করে দেখুন।</p></div>';
         return;
       }
 
       grid.innerHTML = chaptersList.map(item => {
-        let badgeColor = 'bg-slate-800 text-slate-400 border-slate-700';
-        let badgeText = 'শুরু করিনি';
-        if (item.prog.status === 'reading') { badgeColor = 'bg-sky-500/10 text-sky-400 border-sky-500/30'; badgeText = 'পড়ছি'; }
-        if (item.prog.status === 'revision') { badgeColor = 'bg-amber-500/10 text-amber-400 border-amber-500/30'; badgeText = 'রিভিশন বাকি'; }
-        if (item.prog.status === 'mastered') { badgeColor = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'; badgeText = 'সম্পূর্ণ প্রস্তুত ★'; }
-
+        const statusInfo = item.prog.status === 'reading'
+          ? { text: 'চলমান', color: 'bg-sky-500/10 text-sky-400 border-sky-500/30', next: 'সম্পন্ন করুন', nextColor: 'bg-sky-500/10 text-sky-300 border-sky-500/30' }
+          : item.prog.status === 'mastered'
+          ? { text: 'সম্পন্ন', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30', next: 'আবার অসম্পূর্ণ করুন', nextColor: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30' }
+          : { text: 'অসম্পূর্ণ', color: 'bg-slate-800 text-slate-300 border-slate-700', next: 'পড়া শুরু করুন', nextColor: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30' };
+        const pct = item.prog.status === 'mastered' ? 100 : item.prog.status === 'reading' ? 50 : 0;
         return `
-          <div onclick="openChapterModal('${item.id}', '${item.subjectName}')" class="bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 cursor-pointer transition-all flex flex-col justify-between group">
+          <article class="bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-indigo-500/40 rounded-2xl p-5 transition-all flex flex-col justify-between group">
             <div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
-                  ${item.subjectName} • অধ্যায় ${item.chapterNum}
-                </span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md border ${badgeColor}">
-                  ${badgeText}
-                </span>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="text-[11px] font-semibold px-2 py-1 rounded-full bg-slate-800 text-slate-300">${escapeHTML(item.subjectName)} · অধ্যায় ${item.chapterNum.toLocaleString('bn-BD')}</span>
+                <span class="text-[10px] font-bold px-2 py-1 rounded-md border ${statusInfo.color}">${statusInfo.text}</span>
               </div>
-              <h3 class="text-base font-bold text-white group-hover:text-indigo-400 transition-colors mb-1">
-                ${item.name}
-              </h3>
-              <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed mb-4">
-                ${item.summary}
-              </p>
+              <button type="button" onclick="openChapterModal('${escapeHTML(item.id)}', '${escapeHTML(item.subjectName)}')" class="text-left w-full text-base font-bold text-white hover:text-indigo-400 transition-colors mb-2">${escapeHTML(item.name)}</button>
+              <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed mb-4">${escapeHTML(item.summary || '')}</p>
+              <div class="chapter-progress-track mb-2"><div class="chapter-progress-fill ${item.prog.status === 'mastered' ? 'bg-emerald-500' : item.prog.status === 'reading' ? 'bg-sky-500' : 'bg-slate-600'}" style="width:${pct}%"></div></div>
+              <div class="flex justify-between text-[10px] text-slate-500 mb-4"><span>অধ্যায়ের অগ্রগতি</span><span>${pct.toLocaleString('bn-BD')}%</span></div>
             </div>
-            <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-              <span class="text-indigo-400 font-semibold group-hover:underline">বিস্তারিত ও নোট →</span>
-              <button type="button" onclick="event.stopPropagation();toggleBookmark('${item.id}')" class="relative z-10 px-2 py-1 rounded-lg border border-slate-700 ${item.prog.bookmarked ? 'text-amber-300 bg-amber-500/10' : 'text-slate-500'}" aria-label="বুকমার্ক">${item.prog.bookmarked ? '★ সংরক্ষিত' : '☆ সেভ'}</button>
+            <div class="pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">
+              <button type="button" onclick="cycleChapterStatus('${escapeHTML(item.id)}')" class="chapter-status-action px-3 py-2 rounded-xl border ${statusInfo.nextColor} text-[11px] font-bold">${statusInfo.next}</button>
+              <button type="button" onclick="toggleBookmark('${escapeHTML(item.id)}')" class="px-2 py-2 rounded-lg border border-slate-700 text-[11px] ${item.prog.bookmarked ? 'text-amber-300 bg-amber-500/10' : 'text-slate-500'}" aria-label="বুকমার্ক">${item.prog.bookmarked ? '★ সেভ করা' : '☆ সেভ'}</button>
             </div>
-          </div>
-        `;
+          </article>`;
       }).join('');
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
     }
 
     function toggleBookmark(chapterId) {
@@ -839,15 +941,7 @@
       document.getElementById('modal-summary').innerText = foundChap.summary || '';
       document.getElementById('modal-notes').value = p.notes || '';
 
-      document.getElementById('modal-formulas').innerHTML = foundChap.formulas.length
-        ? foundChap.formulas.map(f => `
-        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 font-mono text-indigo-300 text-xs">
-          ${f}
-        </div>
-      `).join('')
-        : '<div class="text-slate-500 text-xs">এই অধ্যায়ের নির্দিষ্ট সূত্র এখনো যোগ করা হয়নি।</div>';
-
-      updateModalStatusUI(p.status || 'not_started');
+      updateModalStatusUI(['not_started','reading','mastered'].includes(p.status) ? p.status : 'not_started');
       document.getElementById('chapter-modal').classList.remove('hidden');
       lucide.createIcons();
     }
@@ -859,16 +953,15 @@
     }
 
     function setModalChapterStatus(status) {
-      if (!activeModalChapter) return;
-      if (!progress[activeModalChapter.id]) progress[activeModalChapter.id] = {};
+      if (!activeModalChapter || !['not_started', 'reading', 'mastered'].includes(status)) return;
+      if (!progress[activeModalChapter.id]) progress[activeModalChapter.id] = { notes: '', bookmarked: false };
       progress[activeModalChapter.id].status = status;
-      if (status === 'mastered') progress[activeModalChapter.id].reviewDue = dateKeyFromOffset(1);
-      else if (status === 'revision') progress[activeModalChapter.id].reviewDue = dateKeyFromOffset(0);
-      else if (status === 'not_started') delete progress[activeModalChapter.id].reviewDue;
+      delete progress[activeModalChapter.id].reviewDue;
       saveProgress();
-      renderPlanner();
       updateModalStatusUI(status);
+      renderSubjectFilters();
       renderChapters();
+      updateStats();
     }
 
     function saveModalNotes(notes) {
@@ -888,28 +981,26 @@
       });
     }
 
-    // Stats Calculation
+    // Stats calculation: counts and overall progress use the three-state model.
     function updateStats() {
-      let mastered = 0, reading = 0, revision = 0;
-      SUBJECTS.forEach(s => {
-        s.chapters.forEach(c => {
-          const p = progress[c.id];
-          if (p?.status === 'mastered') mastered++;
-          else if (p?.status === 'reading') reading++;
-          else if (p?.status === 'revision') revision++;
-        });
-      });
+      let mastered = 0, reading = 0, incomplete = 0;
+      SUBJECTS.forEach(s => s.chapters.forEach(c => {
+        const status = progress[c.id]?.status;
+        if (status === 'mastered') mastered++;
+        else if (status === 'reading') reading++;
+        else incomplete++;
+      }));
       const pct = TOTAL_CHAPTERS ? Math.round((mastered / TOTAL_CHAPTERS) * 100) : 0;
-      document.getElementById('mastered-count-badge').innerText = `${mastered}/${TOTAL_CHAPTERS}`;
-      document.getElementById('stat-mastered').innerText = mastered;
-      document.getElementById('stat-reading').innerText = reading;
-      document.getElementById('stat-revision').innerText = revision;
-      document.getElementById('stat-percent').innerText = `${pct}% সম্পন্ন`;
-      const heroProgress = document.getElementById('hero-progress');
-      const heroMastered = document.getElementById('hero-mastered');
+      const setText = (id, value) => { const el = document.getElementById(id); if (el) el.innerText = value; };
+      setText('mastered-count-badge', `${mastered}/${TOTAL_CHAPTERS}`);
+      setText('stat-total', `${TOTAL_CHAPTERS.toLocaleString('bn-BD')} টি`);
+      setText('stat-mastered', mastered.toLocaleString('bn-BD'));
+      setText('stat-reading', reading.toLocaleString('bn-BD'));
+      setText('stat-incomplete', incomplete.toLocaleString('bn-BD'));
+      setText('stat-percent', `${pct.toLocaleString('bn-BD')}% সম্পন্ন`);
+      setText('hero-progress', `${pct.toLocaleString('bn-BD')}%`);
+      setText('hero-mastered', `${mastered.toLocaleString('bn-BD')} / ${TOTAL_CHAPTERS.toLocaleString('bn-BD')}`);
       const ring = document.getElementById('progress-ring');
-      if (heroProgress) heroProgress.innerText = `${pct}%`;
-      if (heroMastered) heroMastered.innerText = `${mastered} / ${TOTAL_CHAPTERS.toLocaleString('bn-BD')}`;
       if (ring) ring.style.setProperty('--progress', `${pct * 3.6}deg`);
     }
 
@@ -925,90 +1016,12 @@
       progress = {};
       saveProgress();
       renderChapters();
+      renderSubjectFilters();
+      updateStats();
       closeResetModal();
       showToast('অধ্যায়ের প্রগ্রেস রিসেট করা হয়েছে');
     }
 
-    // Render Formulas
-    function renderFormulas() {
-      document.getElementById('formulas-container').innerHTML = FORMULAS.map(f => `
-        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
-          <div class="text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded w-max">${escapeHTML(f.subject)}</div>
-          <div class="text-sm font-bold text-white">${escapeHTML(f.title)}</div>
-          <div class="p-3 bg-slate-900 rounded-lg text-amber-300 font-mono text-xs text-center border border-slate-800 select-all">${escapeHTML(f.eq)}</div>
-        </div>
-      `).join('');
-    }
-
-    // Goals Handling
-    let goals = readStoredJSON('ssc_goals_standalone', []);
-    if (!Array.isArray(goals)) goals = [];
-    function renderGoals() {
-      const container = document.getElementById('goals-list');
-      if (goals.length === 0) {
-        container.innerHTML = '<div class="text-xs text-slate-500 text-center py-4">কোনো টার্গেট নেই। ওপরে লিখে যোগ করুন!</div>';
-        return;
-      }
-      container.innerHTML = goals.map((g, i) => `
-        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3 text-xs">
-          <label class="flex items-center gap-2 cursor-pointer flex-1">
-            <input type="checkbox" ${g.done ? 'checked' : ''} onchange="toggleGoal(${i})" class="rounded border-slate-700">
-            <span class="${g.done ? 'line-through text-slate-500' : 'text-slate-200'}">${escapeHTML(g.text)}</span>
-          </label>
-          <button onclick="deleteGoal(${i})" class="text-slate-500 hover:text-rose-400">মুছুন</button>
-        </div>
-      `).join('');
-    }
-    function addGoal() {
-      const input = document.getElementById('goal-input');
-      if (!input.value.trim()) return;
-      goals.push({ text: input.value.trim(), done: false });
-      localStorage.setItem('ssc_goals_standalone', JSON.stringify(goals));
-      input.value = '';
-      renderGoals();
-    }
-    function toggleGoal(i) {
-      goals[i].done = !goals[i].done;
-      localStorage.setItem('ssc_goals_standalone', JSON.stringify(goals));
-      renderGoals();
-    }
-    function deleteGoal(i) {
-      goals.splice(i, 1);
-      localStorage.setItem('ssc_goals_standalone', JSON.stringify(goals));
-      renderGoals();
-    }
-
-    // Planner settings and date helpers. Dates are local calendar dates to avoid UTC day shifts.
-    function localDateKey(date = new Date()) {
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, '0');
-      const d = String(date.getDate()).padStart(2, '0');
-      return `${y}-${m}-${d}`;
-    }
-    function dateKeyFromOffset(days) {
-      const d = new Date();
-      d.setHours(12, 0, 0, 0);
-      d.setDate(d.getDate() + days);
-      return localDateKey(d);
-    }
-    function safeStore(key, value) {
-      try { localStorage.setItem(key, JSON.stringify(value)); return true; }
-      catch (e) { showToast('ডেটা সেভ করা যায়নি—ডিভাইসের স্টোরেজ পরীক্ষা করো।'); return false; }
-    }
-    function loadPlannerSettings() {
-      const settings = readStoredJSON('ssc_planner_settings', {});
-      const exam = document.getElementById('exam-date');
-      const goal = document.getElementById('daily-focus-goal');
-      if (exam) exam.value = typeof settings.examDate === 'string' ? settings.examDate : '';
-      if (goal) goal.value = String(Math.max(15, Math.min(1440, Number(settings.dailyGoal) || 120)));
-    }
-    function savePlannerSettings() {
-      const examDate = document.getElementById('exam-date')?.value || '';
-      const dailyGoal = Math.max(15, Math.min(1440, Number(document.getElementById('daily-focus-goal')?.value) || 120));
-      safeStore('ssc_planner_settings', { examDate, dailyGoal });
-      renderPlanner();
-      showToast('পরিকল্পনার সেটিংস সেভ হয়েছে');
-    }
     function renderPlanner() {
       const settings = readStoredJSON('ssc_planner_settings', {});
       const examEl = document.getElementById('exam-countdown');
@@ -1027,16 +1040,6 @@
       const goal = Math.max(15, Number(settings.dailyGoal) || 120);
       const focus = document.getElementById('today-focus-progress');
       if (focus) focus.textContent = `আজকের ফোকাস: ${todayMinutes.toLocaleString('bn-BD')} / ${goal.toLocaleString('bn-BD')} মিনিট (${Math.min(100, Math.round(todayMinutes / goal * 100))}%)`;
-
-      const due = [];
-      SUBJECTS.forEach(sub => sub.chapters.forEach(ch => {
-        const p = progress[ch.id];
-        if (p && p.reviewDue && p.reviewDue <= todayKey) due.push({ name: ch.name, subject: sub.name, id: ch.id, due: p.reviewDue });
-      }));
-      const dueCount = document.getElementById('revision-due-count');
-      const dueList = document.getElementById('revision-due-list');
-      if (dueCount) dueCount.textContent = `${due.length.toLocaleString('bn-BD')}টি বাকি`;
-      if (dueList) dueList.innerHTML = due.length ? due.slice(0, 12).map(ch => `<button type="button" onclick="openChapterModal('${escapeHTML(ch.id)}','${escapeHTML(ch.subject)}')" class="w-full text-left p-3 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-500/40"><span class="block text-xs font-bold text-slate-200">${escapeHTML(ch.name)}</span><span class="block text-[11px] text-slate-500 mt-1">${escapeHTML(ch.subject)} · রিভিশন বাকি</span></button>`).join('') : '<p class="text-xs text-slate-500 py-2">চমৎকার! আজ কোনো রিভিশন বাকি নেই। অধ্যায় সম্পন্ন করলে এখানে রিভিশন দেখাবে।</p>';
 
       const analytics = document.getElementById('weekly-analytics');
       const summary = document.getElementById('analytics-summary');
@@ -1074,7 +1077,7 @@
         if (file.size > 5 * 1024 * 1024) throw new Error('ফাইলটি ৫ MB-এর চেয়ে বড়।');
         const data = JSON.parse(await file.text());
         if (!data || data.app !== 'SSC StudyHub' || data.version !== 1 || !data.progress || typeof data.progress !== 'object' || Array.isArray(data.progress) || !Array.isArray(data.goals)) throw new Error('এটি বৈধ SSC StudyHub ব্যাকআপ ফাইল নয়।');
-        if (!window.confirm('বর্তমান অ্যাপের ডেটা ব্যাকআপ ফাইলের ডেটা দিয়ে প্রতিস্থাপন করা হবে। চালিয়ে যাবে?')) return;
+        const doImport = () => {
         const pairs = [
           ['ssc_progress_standalone_v2', data.progress], ['ssc_goals_standalone', data.goals],
           ['ssc_pomo_count', String(Math.max(0, Number(data.pomoCount) || 0))],
@@ -1088,6 +1091,8 @@
         }
         if (data.theme === 'light' || data.theme === 'dark') applyTheme(data.theme);
         location.reload();
+        };
+        showAppConfirmation('ব্যাকআপ রিস্টোর করবেন?', 'বর্তমান প্রগ্রেস, লক্ষ্য ও টাইমারের সংরক্ষিত ডেটা ব্যাকআপ ফাইলের ডেটা দিয়ে প্রতিস্থাপন হবে।', 'রিস্টোর করুন', doImport);
       } catch (e) { showToast(e.message || 'ব্যাকআপ রিস্টোর করা যায়নি'); }
       finally { input.value = ''; }
     }
@@ -1282,6 +1287,18 @@
     window.addEventListener('DOMContentLoaded', init);
   </script>
 
+  <!-- App-owned confirmation dialog: no browser/GitHub identity popup -->
+  <div id="confirm-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="confirm-title">
+    <div class="confirm-box">
+      <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-2xl mb-4">?</div>
+      <h3 id="confirm-title" class="text-lg font-bold mb-2">নিশ্চিত করবেন?</h3>
+      <p id="confirm-message" class="text-sm text-slate-400 leading-relaxed"></p>
+      <div class="flex justify-end gap-2 mt-6">
+        <button type="button" onclick="closeAppConfirmation()" class="px-4 py-2.5 rounded-xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800">বাতিল</button>
+        <button type="button" id="confirm-yes" onclick="acceptAppConfirmation()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold">নিশ্চিত করুন</button>
+      </div>
+    </div>
+  </div>
   <!-- App-owned confirmation dialog (no browser confirm popup) -->
   <div id="reset-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="reset-title">
     <div class="reset-box">
