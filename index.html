@@ -84,6 +84,31 @@
     }
     .light-mode .custom-scroll::-webkit-scrollbar-track { background:#e2e8f0; }
     .light-mode .custom-scroll::-webkit-scrollbar-thumb { background:#cbd5e1; }
+
+    /* SSC StudyHub premium visual layer: intentionally distinct from the HSC tracker */
+    :root { color-scheme: dark; }
+    body { background-image: radial-gradient(ellipse at 12% 0%, rgba(79,70,229,.13), transparent 34%), radial-gradient(ellipse at 95% 20%, rgba(14,165,233,.08), transparent 28%); }
+    header.sticky { box-shadow: 0 8px 30px rgba(2,6,23,.18); }
+    #view-chapters > .relative:first-child { border:1px solid rgba(255,255,255,.18); }
+    .premium-card { background:linear-gradient(145deg,rgba(30,41,59,.92),rgba(15,23,42,.96)); border:1px solid rgba(148,163,184,.16); box-shadow:0 14px 35px rgba(2,6,23,.14); }
+    .light-mode .premium-card { background:linear-gradient(145deg,#fff,#f5f8ff); border-color:#e2e8f0; }
+    #chapters-grid > div { min-height:190px; box-shadow:0 8px 24px rgba(2,6,23,.10); }
+    #chapters-grid > div:hover { transform:translateY(-3px); box-shadow:0 15px 32px rgba(2,6,23,.2); }
+    #chapters-grid > div { transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease; }
+    button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible { outline:2px solid #818cf8; outline-offset:2px; }
+    .status-btn { white-space:nowrap; }
+    #study-floating { position:fixed;right:16px;bottom:16px;z-index:45;display:none;align-items:center;gap:9px;padding:11px 15px;border-radius:999px;background:#312e81;color:#fff;border:1px solid rgba(165,180,252,.55);box-shadow:0 10px 30px rgba(49,46,129,.35);font-size:12px;font-weight:800;cursor:pointer; }
+    #study-floating.show { display:flex; }
+    #study-floating.running { animation:focusGlow 1.8s ease-in-out infinite; }
+    @keyframes focusGlow { 0%,100% { box-shadow:0 8px 24px rgba(99,102,241,.18); } 50% { box-shadow:0 0 0 5px rgba(129,140,248,.12),0 8px 28px rgba(99,102,241,.42); } }
+    #app-toast { position:fixed;left:50%;bottom:22px;transform:translate(-50%,15px);opacity:0;pointer-events:none;z-index:100;max-width:calc(100vw - 28px);padding:11px 16px;border-radius:13px;background:#0f172a;color:#f8fafc;border:1px solid #334155;box-shadow:0 12px 35px rgba(0,0,0,.28);font-size:12px;font-weight:700;transition:opacity .2s,transform .2s; }
+    #app-toast.show { opacity:1;transform:translate(-50%,0); }
+    #reset-modal { position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(2,6,23,.76);backdrop-filter:blur(8px); }
+    #reset-modal.show { display:flex; }
+    #reset-modal .reset-box { width:100%;max-width:390px;padding:24px;border-radius:22px;background:#111827;border:1px solid #334155;box-shadow:0 25px 80px rgba(0,0,0,.45); }
+    .light-mode #reset-modal .reset-box { background:#fff;color:#0f172a; }
+    @media(max-width:640px) { #study-floating { right:10px;bottom:10px;padding:10px 12px; } #chapters-grid > div { min-height:0; } }
+
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
@@ -530,15 +555,43 @@
     ];
 
     // STATE
-    let progress = JSON.parse(localStorage.getItem('ssc_progress_standalone_v2') || '{}');
+    // Safe storage reads prevent a damaged localStorage value from breaking app startup.
+    function readStoredJSON(key, fallback) {
+      try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+      catch (error) { console.warn('Stored data could not be read:', key, error); return fallback; }
+    }
+    let progress = readStoredJSON('ssc_progress_standalone_v2', {});
+    if (!progress || typeof progress !== 'object' || Array.isArray(progress)) progress = {};
+    const TOTAL_CHAPTERS = SUBJECTS.reduce((sum, subject) => sum + subject.chapters.length, 0);
+    let studySecondsToday = 0;
+    let pomoMode = 'study';
+    let pomoEndsAt = null;
+    let pomoRunning = false;
+    let pomoTickHandle = null;
+    let pomoHistory = readStoredJSON('ssc_pomo_history', {});
+    if (!pomoHistory || typeof pomoHistory !== 'object' || Array.isArray(pomoHistory)) pomoHistory = {};
     let currentSubjectFilter = 'all';
     let currentStatusFilter = 'all';
     let currentSearch = '';
     let activeModalChapter = null;
 
     // Save Progress to localStorage
+    function escapeHTML(value) {
+      return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+
+    function showToast(message) {
+      const el = document.getElementById('app-toast');
+      if (!el) return;
+      el.textContent = message;
+      el.classList.add('show');
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => el.classList.remove('show'), 2600);
+    }
+
     function saveProgress() {
-      localStorage.setItem('ssc_progress_standalone_v2', JSON.stringify(progress));
+      try { localStorage.setItem('ssc_progress_standalone_v2', JSON.stringify(progress)); }
+      catch (error) { showToast('ডিভাইসে জায়গা নেই—প্রগ্রেস সেভ হয়নি।'); }
       updateStats();
     }
 
@@ -569,17 +622,28 @@
     function init() {
       applyTheme(localStorage.getItem('ssc_theme') || 'dark');
       renderSubjectFilters();
+      const chapterTab = document.getElementById('tab-btn-chapters');
+      if (chapterTab) chapterTab.innerHTML = `<i data-lucide="layers" class="w-4 h-4"></i> অধ্যায় ট্র্যাকার (98)`;
+      const totalStat = document.querySelector('#view-chapters .grid.grid-cols-2.sm\\:grid-cols-4 > div:first-child .text-2xl');
+      if (totalStat) totalStat.textContent = `${TOTAL_CHAPTERS.toLocaleString('bn-BD')} টি`;
       renderChapters();
       renderFormulas();
       renderGoals();
       updateStats();
+      restorePomodoro();
+      const floating = document.getElementById('study-floating');
+      if (floating) floating.addEventListener('click', openFloatingTimer);
       lucide.createIcons();
+      if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      }
 
-      // Close modal on Escape key
+      // Escape closes overlays; clicks inside the modal do not close it accidentally.
       window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          closeChapterModal();
-        }
+        if (e.key === 'Escape') { closeChapterModal(); closeResetModal(); }
+      });
+      document.getElementById('reset-modal').addEventListener('click', e => {
+        if (e.target.id === 'reset-modal') closeResetModal();
       });
     }
 
@@ -603,7 +667,7 @@
       const container = document.getElementById('subject-filters');
       container.innerHTML = `
         <button onclick="setSubjectFilter('all')" class="px-3.5 py-1.5 rounded-xl border text-xs font-semibold whitespace-nowrap transition-all ${currentSubjectFilter === 'all' ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-slate-900 border-slate-800 text-slate-400'}">
-          সব বিষয় (৯৮)
+          সব বিষয় (${TOTAL_CHAPTERS})
         </button>
       ` + SUBJECTS.map(s => `
         <button onclick="setSubjectFilter('${s.id}')" class="px-3.5 py-1.5 rounded-xl border text-xs font-semibold whitespace-nowrap transition-all ${currentSubjectFilter === s.id ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-slate-900 border-slate-800 text-slate-400'}">
@@ -691,12 +755,21 @@
               </p>
             </div>
             <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-              <span class="text-indigo-400 font-semibold group-hover:underline">বিস্তারিত ও নোট -></span>
+              <span class="text-indigo-400 font-semibold group-hover:underline">বিস্তারিত ও নোট →</span>
+              <button type="button" onclick="event.stopPropagation();toggleBookmark('${item.id}')" class="relative z-10 px-2 py-1 rounded-lg border border-slate-700 ${item.prog.bookmarked ? 'text-amber-300 bg-amber-500/10' : 'text-slate-500'}" aria-label="বুকমার্ক">${item.prog.bookmarked ? '★ সংরক্ষিত' : '☆ সেভ'}</button>
             </div>
           </div>
         `;
       }).join('');
       lucide.createIcons();
+    }
+
+    function toggleBookmark(chapterId) {
+      if (!progress[chapterId]) progress[chapterId] = { status: 'not_started', notes: '', bookmarked: false };
+      progress[chapterId].bookmarked = !progress[chapterId].bookmarked;
+      saveProgress();
+      renderChapters();
+      showToast(progress[chapterId].bookmarked ? '★ অধ্যায় বুকমার্ক করা হয়েছে' : 'বুকমার্ক সরানো হয়েছে');
     }
 
     // Modal Handling
@@ -741,6 +814,7 @@
       progress[activeModalChapter.id].status = status;
       saveProgress();
       updateModalStatusUI(status);
+      renderChapters();
     }
 
     function saveModalNotes(notes) {
@@ -771,8 +845,8 @@
           else if (p?.status === 'revision') revision++;
         });
       });
-      const pct = Math.round((mastered / 98) * 100);
-      document.getElementById('mastered-count-badge').innerText = `${mastered}/98`;
+      const pct = TOTAL_CHAPTERS ? Math.round((mastered / TOTAL_CHAPTERS) * 100) : 0;
+      document.getElementById('mastered-count-badge').innerText = `${mastered}/${TOTAL_CHAPTERS}`;
       document.getElementById('stat-mastered').innerText = mastered;
       document.getElementById('stat-reading').innerText = reading;
       document.getElementById('stat-revision').innerText = revision;
@@ -781,31 +855,40 @@
       const heroMastered = document.getElementById('hero-mastered');
       const ring = document.getElementById('progress-ring');
       if (heroProgress) heroProgress.innerText = `${pct}%`;
-      if (heroMastered) heroMastered.innerText = `${mastered} / ৯৮`;
+      if (heroMastered) heroMastered.innerText = `${mastered} / ${TOTAL_CHAPTERS.toLocaleString('bn-BD')}`;
       if (ring) ring.style.setProperty('--progress', `${pct * 3.6}deg`);
     }
 
     function resetAllProgress() {
-      if (confirm('আপনি কি সত্যিই সম্পূর্ণ প্রগ্রেস রিসেট করতে চান?')) {
-        progress = {};
-        saveProgress();
-        renderChapters();
-      }
+      document.getElementById('reset-modal').classList.add('show');
+      document.getElementById('reset-modal').setAttribute('aria-hidden', 'false');
+    }
+    function closeResetModal() {
+      document.getElementById('reset-modal').classList.remove('show');
+      document.getElementById('reset-modal').setAttribute('aria-hidden', 'true');
+    }
+    function confirmResetProgress() {
+      progress = {};
+      saveProgress();
+      renderChapters();
+      closeResetModal();
+      showToast('অধ্যায়ের প্রগ্রেস রিসেট করা হয়েছে');
     }
 
     // Render Formulas
     function renderFormulas() {
       document.getElementById('formulas-container').innerHTML = FORMULAS.map(f => `
         <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
-          <div class="text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded w-max">${f.subject}</div>
-          <div class="text-sm font-bold text-white">${f.title}</div>
-          <div class="p-3 bg-slate-900 rounded-lg text-amber-300 font-mono text-xs text-center border border-slate-800 select-all">${f.eq}</div>
+          <div class="text-[11px] font-semibold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded w-max">${escapeHTML(f.subject)}</div>
+          <div class="text-sm font-bold text-white">${escapeHTML(f.title)}</div>
+          <div class="p-3 bg-slate-900 rounded-lg text-amber-300 font-mono text-xs text-center border border-slate-800 select-all">${escapeHTML(f.eq)}</div>
         </div>
       `).join('');
     }
 
     // Goals Handling
-    let goals = JSON.parse(localStorage.getItem('ssc_goals_standalone') || '[]');
+    let goals = readStoredJSON('ssc_goals_standalone', []);
+    if (!Array.isArray(goals)) goals = [];
     function renderGoals() {
       const container = document.getElementById('goals-list');
       if (goals.length === 0) {
@@ -816,7 +899,7 @@
         <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3 text-xs">
           <label class="flex items-center gap-2 cursor-pointer flex-1">
             <input type="checkbox" ${g.done ? 'checked' : ''} onchange="toggleGoal(${i})" class="rounded border-slate-700">
-            <span class="${g.done ? 'line-through text-slate-500' : 'text-slate-200'}">${g.text}</span>
+            <span class="${g.done ? 'line-through text-slate-500' : 'text-slate-200'}">${escapeHTML(g.text)}</span>
           </label>
           <button onclick="deleteGoal(${i})" class="text-slate-500 hover:text-rose-400">মুছুন</button>
         </div>
@@ -841,69 +924,210 @@
       renderGoals();
     }
 
-    // Pomodoro Timer
+    // Pomodoro timer: deadline-based timing avoids drift when a tab sleeps.
     let pomoTime = 25 * 60;
     let pomoTimer = null;
-    let pomoCount = parseInt(localStorage.getItem('ssc_pomo_count') || '0', 10);
-    document.getElementById('pomo-session-count').innerText = pomoCount;
+    let pomoCount = Math.max(0, parseInt(localStorage.getItem('ssc_pomo_count') || '0', 10) || 0);
+    document.getElementById('pomo-session-count').innerText = pomoCount.toLocaleString('bn-BD');
+
+    function persistPomodoro() {
+      try {
+        localStorage.setItem('ssc_pomo_state', JSON.stringify({
+          mode: pomoMode, remaining: pomoTime, running: pomoRunning,
+          endsAt: pomoEndsAt, savedAt: Date.now()
+        }));
+      } catch (error) { /* Timer remains usable even if storage is unavailable. */ }
+    }
+
+    function paintPomodoroMode() {
+      const study = document.getElementById('pomo-study-btn');
+      const brk = document.getElementById('pomo-break-btn');
+      study.className = 'px-4 py-1.5 rounded-xl text-xs font-bold transition-all ' +
+        (pomoMode === 'study' ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400');
+      brk.className = 'px-4 py-1.5 rounded-xl text-xs font-bold transition-all ' +
+        (pomoMode === 'break' ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-400');
+    }
 
     function setPomodoroMode(mode) {
-      clearInterval(pomoTimer);
-      pomoTimer = null;
+      stopPomodoroTick();
+      pomoMode = mode === 'break' ? 'break' : 'study';
+      pomoRunning = false;
+      pomoEndsAt = null;
+      pomoTime = pomoMode === 'study' ? 25 * 60 : 5 * 60;
       document.getElementById('pomo-start-btn').innerText = 'শুরু করুন';
-      if (mode === 'study') {
-        pomoTime = 25 * 60;
-        document.getElementById('pomo-study-btn').className = 'px-4 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white';
-        document.getElementById('pomo-break-btn').className = 'px-4 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400';
-      } else {
-        pomoTime = 5 * 60;
-        document.getElementById('pomo-break-btn').className = 'px-4 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white';
-        document.getElementById('pomo-study-btn').className = 'px-4 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-400';
-      }
+      paintPomodoroMode();
       updatePomoDisplay();
+      persistPomodoro();
+    }
+
+    function stopPomodoroTick() {
+      if (pomoTimer) clearInterval(pomoTimer);
+      pomoTimer = null;
+    }
+
+    function startPomodoroTick() {
+      stopPomodoroTick();
+      pomoTimer = setInterval(() => {
+        if (!pomoRunning || !Number.isFinite(pomoEndsAt)) return;
+        pomoTime = Math.max(0, Math.ceil((pomoEndsAt - Date.now()) / 1000));
+        updatePomoDisplay();
+        if (pomoTime <= 0) finishPomodoro();
+      }, 250);
     }
 
     function togglePomodoro() {
-      if (pomoTimer) {
-        clearInterval(pomoTimer);
-        pomoTimer = null;
-        document.getElementById('pomo-start-btn').innerText = 'শুরু করুন';
+      if (pomoRunning) {
+        pomoTime = Math.max(0, Math.ceil((pomoEndsAt - Date.now()) / 1000));
+        pomoRunning = false;
+        pomoEndsAt = null;
+        stopPomodoroTick();
+        document.getElementById('pomo-start-btn').innerText = 'চালু করুন';
+        document.getElementById('study-floating').classList.remove('running');
+        persistPomodoro();
+        updatePomoDisplay();
+        showToast('টাইমার বিরতি দেওয়া হয়েছে');
       } else {
+        if (pomoTime <= 0) pomoTime = pomoMode === 'study' ? 25 * 60 : 5 * 60;
+        pomoRunning = true;
+        pomoEndsAt = Date.now() + pomoTime * 1000;
         document.getElementById('pomo-start-btn').innerText = 'থামান';
-        pomoTimer = setInterval(() => {
-          if (pomoTime > 0) {
-            pomoTime--;
-            updatePomoDisplay();
-          } else {
-            clearInterval(pomoTimer);
-            pomoTimer = null;
-            alert('পোমোডোরো সেশন শেষ!');
-            pomoCount++;
-            localStorage.setItem('ssc_pomo_count', pomoCount);
-            document.getElementById('pomo-session-count').innerText = pomoCount;
-            setPomodoroMode('break');
-          }
-        }, 1000);
+        document.getElementById('study-floating').classList.add('show','running');
+        persistPomodoro();
+        startPomodoroTick();
+        updatePomoDisplay();
       }
     }
 
-    function resetPomodoro() {
-      clearInterval(pomoTimer);
-      pomoTimer = null;
-      document.getElementById('pomo-start-btn').innerText = 'শুরু করুন';
-      pomoTime = 25 * 60;
+    function finishPomodoro() {
+      stopPomodoroTick();
+      pomoRunning = false;
+      pomoEndsAt = null;
+      pomoTime = 0;
+      if (pomoMode === 'study') {
+        pomoCount++;
+        localStorage.setItem('ssc_pomo_count', String(pomoCount));
+        document.getElementById('pomo-session-count').innerText = pomoCount.toLocaleString('bn-BD');
+        const dayKey = new Date().toLocaleDateString('en-CA');
+        pomoHistory[dayKey] = (Number(pomoHistory[dayKey]) || 0) + 1;
+        try { localStorage.setItem('ssc_pomo_history', JSON.stringify(pomoHistory)); } catch (e) {}
+      }
       updatePomoDisplay();
+      document.getElementById('pomo-start-btn').innerText = 'শুরু করুন';
+      document.getElementById('study-floating').classList.remove('running');
+      persistPomodoro();
+      playFinishSignal();
+      showToast(pomoMode === 'study' ? '🎉 ফোকাস সেশন শেষ! এবার একটু বিরতি নাও।' : '☀️ বিরতি শেষ—আবার শুরু করার সময়!');
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try { new Notification('SSC StudyHub', { body: pomoMode === 'study' ? 'ফোকাস সেশন শেষ! একটু বিরতি নাও।' : 'বিরতি শেষ! পড়ায় ফিরে যাও।' }); } catch (e) {}
+      }
+      if (pomoMode === 'study') {
+        pomoMode = 'break'; pomoTime = 5 * 60;
+      } else {
+        pomoMode = 'study'; pomoTime = 25 * 60;
+      }
+      paintPomodoroMode();
+      updatePomoDisplay();
+      persistPomodoro();
+    }
+
+    function playFinishSignal() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        [0, 0.22, 0.44].forEach((delay, i) => {
+          const osc = ctx.createOscillator(), gain = ctx.createGain();
+          osc.type = 'sine'; osc.frequency.value = [660, 784, 988][i];
+          gain.gain.setValueAtTime(0.0001, ctx.currentTime + delay);
+          gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + delay + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + delay + 0.32);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + delay); osc.stop(ctx.currentTime + delay + 0.34);
+        });
+        setTimeout(() => ctx.close(), 1200);
+      } catch (e) {}
+    }
+
+    function restorePomodoro() {
+      const saved = readStoredJSON('ssc_pomo_state', null);
+      if (!saved || typeof saved !== 'object') { updatePomoDisplay(); return; }
+      pomoMode = saved.mode === 'break' ? 'break' : 'study';
+      pomoTime = Math.max(0, Math.min(24 * 60 * 60, Number(saved.remaining) || 0));
+      // Never auto-resume after a reload: a running timer is restored as paused.
+      pomoRunning = false;
+      pomoEndsAt = null;
+      if (saved.running && Number.isFinite(Number(saved.endsAt))) {
+        pomoTime = Math.max(0, Math.ceil((Number(saved.endsAt) - Date.now()) / 1000));
+        if (pomoTime === 0) {
+          pomoTime = 0;
+          showToast('আগের ফোকাস সেশনের সময় শেষ হয়েছে');
+        }
+      }
+      document.getElementById('pomo-start-btn').innerText = 'চালু করুন';
+      paintPomodoroMode();
+      updatePomoDisplay();
+      persistPomodoro();
+    }
+
+    function resetPomodoro() {
+      stopPomodoroTick();
+      pomoRunning = false;
+      pomoEndsAt = null;
+      pomoTime = pomoMode === 'study' ? 25 * 60 : 5 * 60;
+      document.getElementById('pomo-start-btn').innerText = 'শুরু করুন';
+      document.getElementById('study-floating').classList.remove('running');
+      updatePomoDisplay();
+      persistPomodoro();
+      showToast('টাইমার রিসেট হয়েছে');
     }
 
     function updatePomoDisplay() {
-      const m = Math.floor(pomoTime / 60).toString().padStart(2, '0');
-      const s = (pomoTime % 60).toString().padStart(2, '0');
-      document.getElementById('pomo-display').innerText = `${m}:${s}`;
+      const safeTime = Math.max(0, Number(pomoTime) || 0);
+      const m = Math.floor(safeTime / 60).toString().padStart(2, '0');
+      const s = (safeTime % 60).toString().padStart(2, '0');
+      const display = `${m}:${s}`;
+      const el = document.getElementById('pomo-display');
+      if (el) el.innerText = display;
+      const float = document.getElementById('study-floating');
+      if (float) {
+        float.innerHTML = `<span>🍅</span><span>${pomoMode === 'study' ? 'ফোকাস' : 'বিরতি'} · ${display}</span>`;
+        if (pomoRunning) float.classList.add('show','running');
+        else if (pomoTime !== (pomoMode === 'study' ? 25 * 60 : 5 * 60)) float.classList.add('show');
+        else float.classList.remove('show');
+      }
+      document.title = pomoRunning ? `${display} · SSC StudyHub` : 'SSC StudyHub';
+    }
+
+    function openFloatingTimer() {
+      switchTab('pomodoro');
+      document.getElementById('view-pomodoro').scrollIntoView({behavior:'smooth',block:'start'});
     }
 
     // Run on load
+    window.addEventListener('beforeunload', () => {
+      if (pomoRunning && Number.isFinite(pomoEndsAt)) {
+        pomoTime = Math.max(0, Math.ceil((pomoEndsAt - Date.now()) / 1000));
+      }
+      persistPomodoro();
+    });
     window.addEventListener('DOMContentLoaded', init);
   </script>
+
+  <!-- App-owned confirmation dialog (no browser confirm popup) -->
+  <div id="reset-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="reset-title">
+    <div class="reset-box">
+      <div class="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-2xl mb-4">↻</div>
+      <h3 id="reset-title" class="text-lg font-bold mb-2">প্রগ্রেস রিসেট করবে?</h3>
+      <p class="text-sm text-slate-400 leading-relaxed">সব অধ্যায়ের স্ট্যাটাস, বুকমার্ক এবং অধ্যায়ভিত্তিক নোট মুছে যাবে। এই কাজটি ফিরিয়ে আনা যাবে না।</p>
+      <div class="flex justify-end gap-2 mt-6">
+        <button onclick="closeResetModal()" class="px-4 py-2.5 rounded-xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800">বাতিল</button>
+        <button onclick="confirmResetProgress()" class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold">হ্যাঁ, রিসেট</button>
+      </div>
+    </div>
+  </div>
+  <button id="study-floating" type="button" aria-label="টাইমার খুলুন">🍅 ফোকাস · 25:00</button>
+  <div id="app-toast" role="status" aria-live="polite"></div>
+
   <footer class="mt-10 border-t border-slate-200/70 dark:border-slate-800/70 pt-5 pb-6 text-center">
     <p class="text-sm text-slate-500 dark:text-slate-400">
       © turabi_alam
